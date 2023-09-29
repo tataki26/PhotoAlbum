@@ -28,9 +28,9 @@ class AlbumServiceTest {
         Album savedAlbum = albumRepository.save(album);
 
         // get album from persist context
-        Album resultAlbum = albumService.retrieveAlbumById(savedAlbum.getId());
+        AlbumDto albumDto = albumService.retrieveAlbumById(savedAlbum.getId());
 
-        assertEquals("test", resultAlbum.getName());
+        assertEquals("test", albumDto.getName());
     }
 
     @Test
@@ -41,9 +41,9 @@ class AlbumServiceTest {
         Album savedAlbum = albumRepository.save(album);
 
         // get album from persist context
-        Album resultAlbum = albumService.retrieveAlbumByName(savedAlbum.getName());
+        AlbumDto albumDto = albumService.retrieveAlbumByName(savedAlbum.getName());
 
-        assertEquals("test", resultAlbum.getName());
+        assertEquals("test", albumDto.getName());
     }
 
     @Test

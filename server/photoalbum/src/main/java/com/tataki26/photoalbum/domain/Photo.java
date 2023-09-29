@@ -1,7 +1,7 @@
 package com.tataki26.photoalbum.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -11,7 +11,7 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
 public class Photo {
     @Id @GeneratedValue
     @Column(name = "photo_id", unique = true, nullable = false)

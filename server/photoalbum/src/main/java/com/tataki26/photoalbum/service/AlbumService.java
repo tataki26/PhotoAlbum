@@ -15,19 +15,19 @@ import java.util.Optional;
 public class AlbumService {
     private final AlbumRepository albumRepository;
 
-    public Album retrieveAlbumById(Long id) {
+    public AlbumDto retrieveAlbumById(Long id) {
         Optional<Album> albumOptional = albumRepository.findById(id);
         if (albumOptional.isPresent()) {
-            return albumOptional.get();
+            return AlbumMapper.toDto(albumOptional.get());
         } else {
             throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
         }
     }
 
-    public Album retrieveAlbumByName(String name) {
+    public AlbumDto retrieveAlbumByName(String name) {
         Optional<Album> albumOptional = albumRepository.findByName(name);
         if (albumOptional.isPresent()) {
-            return albumOptional.get();
+            return AlbumMapper.toDto(albumOptional.get());
         } else {
             throw new EntityNotFoundException(name + "(으)로 조회된 앨범이 없습니다");
         }

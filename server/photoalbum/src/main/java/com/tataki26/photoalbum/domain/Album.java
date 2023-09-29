@@ -1,7 +1,7 @@
 package com.tataki26.photoalbum.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
 public class Album {
     @Id @GeneratedValue
     @Column(name = "album_id", unique = true, nullable = false)
