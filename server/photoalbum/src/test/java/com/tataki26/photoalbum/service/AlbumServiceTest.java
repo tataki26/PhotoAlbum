@@ -3,12 +3,14 @@ package com.tataki26.photoalbum.service;
 import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.repository.AlbumRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -42,6 +44,20 @@ class AlbumServiceTest {
         Album resultAlbum = albumService.retrieveAlbumByName(savedAlbum.getName());
 
         assertEquals("test", resultAlbum.getName());
+    }
+
+    @Test
+    void failToRetrieveAlbumById() {
+        assertThrows(EntityNotFoundException.class, () -> {
+            albumService.retrieveAlbumById(-1L);
+        });
+    }
+
+    @Test
+    void failToRetrieveAlbumByName() {
+        assertThrows(EntityNotFoundException.class, () -> {
+            albumService.retrieveAlbumByName("none");
+        });
     }
 
 }
