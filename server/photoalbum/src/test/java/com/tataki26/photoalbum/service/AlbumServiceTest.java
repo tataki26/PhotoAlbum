@@ -19,14 +19,27 @@ class AlbumServiceTest {
     AlbumService albumService;
 
     @Test
-    void retrieveAlbum() {
+    void retrieveAlbumById() {
         // insert album into persist context
         Album album = new Album();
         album.setName("test");
         Album savedAlbum = albumRepository.save(album);
 
         // get album from persist context
-        Album resultAlbum = albumService.retrieveAlbum(savedAlbum.getId());
+        Album resultAlbum = albumService.retrieveAlbumById(savedAlbum.getId());
+
+        assertEquals("test", resultAlbum.getName());
+    }
+
+    @Test
+    void retrieveAlbumByName() {
+        // insert album into persist context
+        Album album = new Album();
+        album.setName("test");
+        Album savedAlbum = albumRepository.save(album);
+
+        // get album from persist context
+        Album resultAlbum = albumService.retrieveAlbumByName(savedAlbum.getName());
 
         assertEquals("test", resultAlbum.getName());
     }
