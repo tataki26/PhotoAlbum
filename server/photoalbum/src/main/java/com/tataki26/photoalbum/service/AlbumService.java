@@ -32,4 +32,9 @@ public class AlbumService {
             throw new EntityNotFoundException(name + "(으)로 조회된 앨범이 없습니다");
         }
     }
+
+    public AlbumDto addNewAlbum(AlbumDto albumDto) {
+        Album album = new Album(albumDto.getName());
+        return AlbumMapper.toDto(albumRepository.save(album));
+    }
 }
