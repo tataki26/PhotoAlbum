@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 public class AlbumController {
@@ -18,7 +20,7 @@ public class AlbumController {
     }
 
     @PostMapping("/albums")
-    public ResponseEntity<AlbumDto> createAlbum(@RequestBody final AlbumDto albumDto) {
+    public ResponseEntity<AlbumDto> createAlbum(@RequestBody final AlbumDto albumDto) throws IOException {
         return new ResponseEntity<>(albumService.addNewAlbum(albumDto), HttpStatus.CREATED);
     }
 }

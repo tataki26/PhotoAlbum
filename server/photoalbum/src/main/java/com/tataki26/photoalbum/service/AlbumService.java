@@ -8,7 +8,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
+
+import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +38,14 @@ public class AlbumService {
         }
     }
 
-    public AlbumDto addNewAlbum(AlbumDto albumDto) {
+    public AlbumDto addNewAlbum(AlbumDto albumDto) throws IOException {
         Album album = new Album(albumDto.getName());
+        createAlbumDirectories(album);
         return AlbumMapper.toDto(albumRepository.save(album));
+    }
+
+    private void createAlbumDirectories(Album album) throws IOException {
+        Files.createDirectories(Paths.get(PATH_PREFIX + "/photos/original/" + album.getId()));
+        Files.createDirectories(Paths.get(PATH_PREFIX + "/photos/thumb/" + album.getId()));
     }
 }
