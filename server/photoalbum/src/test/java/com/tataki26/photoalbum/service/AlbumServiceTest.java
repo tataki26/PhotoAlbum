@@ -23,8 +23,7 @@ class AlbumServiceTest {
     @Test
     void retrieveAlbumById() {
         // insert album into persist context
-        Album album = new Album();
-        album.setName("test");
+        Album album = new Album("test");
         Album savedAlbum = albumRepository.save(album);
 
         // get album from persist context
@@ -36,8 +35,7 @@ class AlbumServiceTest {
     @Test
     void retrieveAlbumByName() {
         // insert album into persist context
-        Album album = new Album();
-        album.setName("test");
+        Album album = new Album("test");
         Album savedAlbum = albumRepository.save(album);
 
         // get album from persist context

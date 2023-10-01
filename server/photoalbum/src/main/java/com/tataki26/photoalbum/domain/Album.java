@@ -18,4 +18,8 @@ public class Album {
     private String name;
     @CreationTimestamp
     private Date createdAt;
+
+    public Album(String name) {
+        this.name = name;
+    }
 }
