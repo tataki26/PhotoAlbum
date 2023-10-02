@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
@@ -48,5 +50,17 @@ public class AlbumService {
     private void createAlbumDirectories(Album album) throws IOException {
         Files.createDirectories(Paths.get(PATH_PREFIX + "/photos/original/" + album.getId()));
         Files.createDirectories(Paths.get(PATH_PREFIX + "/photos/thumb/" + album.getId()));
+    }
+
+    public List<AlbumDto> retrieveAlbumList(String sort, String keyword) {
+        List<Album> albums;
+        if (Objects.equals(sort, "byName")) {
+            albums = albumRepository.findByNameContainingOrderByNameAsc(keyword);
+        } else if (Objects.equals(sort, "byDate")) {
+            albums = albumRepository.findByNameContainingOrderByCreatedAtDesc(keyword);
+        } else {
+            throw new IllegalArgumentException(sort + "(은)는 사용할 수 없는 정렬 기준입니다");
+        }
+        return AlbumMapper.toDtoList(albums);
     }
 }
