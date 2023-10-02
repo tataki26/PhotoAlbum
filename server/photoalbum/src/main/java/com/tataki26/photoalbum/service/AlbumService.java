@@ -40,8 +40,9 @@ public class AlbumService {
 
     public AlbumDto addNewAlbum(AlbumDto albumDto) throws IOException {
         Album album = new Album(albumDto.getName());
-        createAlbumDirectories(album);
-        return AlbumMapper.toDto(albumRepository.save(album));
+        Album savedAlbum = albumRepository.save(album);
+        createAlbumDirectories(savedAlbum);
+        return AlbumMapper.toDto(savedAlbum);
     }
 
     private void createAlbumDirectories(Album album) throws IOException {
