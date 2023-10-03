@@ -1,9 +1,11 @@
 package com.tataki26.photoalbum.service;
 
 import com.tataki26.photoalbum.domain.Album;
+import com.tataki26.photoalbum.domain.Photo;
 import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.mapper.AlbumMapper;
 import com.tataki26.photoalbum.repository.AlbumRepository;
+import com.tataki26.photoalbum.repository.PhotoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 
@@ -21,6 +24,7 @@ import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 @RequiredArgsConstructor
 public class AlbumService {
     private final AlbumRepository albumRepository;
+    private final PhotoRepository photoRepository;
 
     public AlbumDto retrieveAlbumById(Long id) {
         Optional<Album> albumOptional = albumRepository.findById(id);
@@ -61,6 +65,17 @@ public class AlbumService {
         } else {
             throw new IllegalArgumentException(sort + "(은)는 사용할 수 없는 정렬 기준입니다");
         }
-        return AlbumMapper.toDtoList(albums);
+
+        List<AlbumDto> albumDtos = AlbumMapper.toDtoList(albums);
+
+        for (AlbumDto albumDto : albumDtos) {
+            List<Photo> top4 = photoRepository.findTop4ByAlbum_IdOrderByUploadedAtDesc(albumDto.getId());
+            albumDto.setThumbUrls(top4.stream()
+                                      .map(Photo::getThumbUrl)
+                                      .map(url -> PATH_PREFIX + url)
+                                      .collect(Collectors.toList()));
+        }
+
+        return albumDtos;
     }
 }
