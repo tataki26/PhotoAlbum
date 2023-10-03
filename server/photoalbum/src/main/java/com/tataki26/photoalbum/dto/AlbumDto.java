@@ -5,13 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter @Setter
 public class AlbumDto {
     @JsonProperty("albumId")
-    Long id;
+    private Long id;
     @JsonProperty("albumName")
-    String name;
-    Date createAt;
-    int count;
+    private String name;
+    private Date createAt;
+    private int count;
+    private List<String> thumbUrls;
 }
