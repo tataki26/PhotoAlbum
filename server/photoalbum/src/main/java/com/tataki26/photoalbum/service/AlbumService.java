@@ -85,12 +85,20 @@ public class AlbumService {
     public AlbumDto changeName(Long id, AlbumDto albumDto) {
         Optional<Album> albumOptional = albumRepository.findById(id);
         if (albumOptional.isEmpty()) {
-            throw new NoSuchElementException(String.format("ID '%d'가 존재하지 않습니다", id));
+            throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", id));
         }
 
         Album album = albumOptional.get();
         album.setValidName(albumDto.getName());
 
         return AlbumMapper.toDto(albumRepository.save(album));
+    }
+
+    public void removePhotosByAlbumId(Long id) {
+        Album album = albumRepository.findById(id).orElse(null);
+        if (album == null) {
+            throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", id));
+        }
+        albumRepository.deleteById(id);
     }
 }

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.*;
 
 @Entity
 @NoArgsConstructor
@@ -18,6 +21,9 @@ public class Album {
     private String name;
     @CreationTimestamp
     private Date createdAt;
+
+    @OneToMany(mappedBy = "album", cascade = REMOVE)
+    private List<Photo> photos;
 
     public Album(String name) {
         this.name = name;

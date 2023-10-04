@@ -11,29 +11,36 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequestMapping("albums")
 @RequiredArgsConstructor
 public class AlbumController {
     private final AlbumService albumService;
 
-    @GetMapping("/albums/{albumId}")
+    @GetMapping("{albumId}")
     public ResponseEntity<AlbumDto> getAlbum(@PathVariable("albumId") final Long id) {
         return new ResponseEntity<>(albumService.retrieveAlbumById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/albums/{albumId}")
+    @PutMapping("{albumId}")
     public ResponseEntity<AlbumDto> updateAlbum(@PathVariable("albumId") final Long id,
                                                 @RequestBody final AlbumDto albumDto) {
         return new ResponseEntity<>(albumService.changeName(id, albumDto), HttpStatus.OK);
     }
 
-    @PostMapping("/albums")
+    @PostMapping
     public ResponseEntity<AlbumDto> createAlbum(@RequestBody final AlbumDto albumDto) throws IOException {
         return new ResponseEntity<>(albumService.addNewAlbum(albumDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("/albums")
+    @GetMapping
     public ResponseEntity<List<AlbumDto>> getAlbumList(@RequestParam(required = false, defaultValue = "byDate") final String sort,
                                                        @RequestParam(required = false) final String keyword) {
         return new ResponseEntity<>(albumService.retrieveAlbumList(sort, keyword), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{albumId}")
+    public ResponseEntity<Void> deletePhotos(@PathVariable("albumId") final Long id) {
+        albumService.removePhotosByAlbumId(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
