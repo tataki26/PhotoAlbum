@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
     List<Photo> findTop4ByAlbum_IdOrderByUploadedAtDesc(Long id);
+    int countByAlbum_Id(Long id);
 }

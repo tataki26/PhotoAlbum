@@ -30,7 +30,9 @@ public class AlbumService {
     public AlbumDto retrieveAlbumById(Long id) {
         Optional<Album> albumOptional = albumRepository.findById(id);
         if (albumOptional.isPresent()) {
-            return AlbumMapper.toDto(albumOptional.get());
+            AlbumDto albumDto = AlbumMapper.toDto(albumOptional.get());
+            albumDto.setCount(photoRepository.countByAlbum_Id(id));
+            return albumDto;
         } else {
             throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
         }
