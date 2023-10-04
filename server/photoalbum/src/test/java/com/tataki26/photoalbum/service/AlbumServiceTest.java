@@ -4,6 +4,7 @@ import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.repository.AlbumRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,12 +27,20 @@ class AlbumServiceTest {
 
     private static final String TEST_ALBUM_NAME = "test";
 
+    Album savedAlbum;
+    AlbumDto albumDto;
+
+    @BeforeEach
+    void setUp() {
+        Album album = new Album(TEST_ALBUM_NAME);
+        savedAlbum = albumRepository.save(album);
+
+        albumDto = new AlbumDto();
+        albumDto.setName(TEST_ALBUM_NAME);
+    }
+
     @Test
     void retrieveAlbumById() {
-        // insert album into persist context
-        Album album = new Album(TEST_ALBUM_NAME);
-        Album savedAlbum = albumRepository.save(album);
-
         // get album from persist context
         AlbumDto albumDto = albumService.retrieveAlbumById(savedAlbum.getId());
 
@@ -40,10 +49,6 @@ class AlbumServiceTest {
 
     @Test
     void retrieveAlbumByName() {
-        // insert album into persist context
-        Album album = new Album(TEST_ALBUM_NAME);
-        Album savedAlbum = albumRepository.save(album);
-
         // get album from persist context
         AlbumDto albumDto = albumService.retrieveAlbumByName(savedAlbum.getName());
 
@@ -66,22 +71,39 @@ class AlbumServiceTest {
 
     @Test
     void addNewAlbum() throws IOException {
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setName(TEST_ALBUM_NAME);
-
         AlbumDto resultDto = albumService.addNewAlbum(albumDto);
-
         assertEquals(albumDto.getName(), resultDto.getName());
     }
 
     @Test
     void addNewAlbumShouldCreateDirectories() throws IOException {
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setName(TEST_ALBUM_NAME);
-
         AlbumDto resultDto = albumService.addNewAlbum(albumDto);
 
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/original/" + resultDto.getId())));
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/thumb/" + resultDto.getId())));
+    }
+
+    @Test
+    void changeName() throws IOException {
+        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
+
+        AlbumDto requestDto = new AlbumDto();
+        requestDto.setName("changed");
+
+        AlbumDto updatedAlbumDto = albumService.changeName(savedDto.getId(), requestDto);
+
+        assertEquals("changed", updatedAlbumDto.getName());
+    }
+
+    @Test
+    void changeNameWithInvalidName() throws IOException {
+        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
+
+        AlbumDto requestDto = new AlbumDto();
+        requestDto.setName("");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            albumService.changeName(savedDto.getId(), requestDto);
+        });
     }
 }
