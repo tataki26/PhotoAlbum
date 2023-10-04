@@ -22,4 +22,12 @@ public class Album {
     public Album(String name) {
         this.name = name;
     }
+
+    public void setValidName(String name) {
+        if (name != null && !name.isEmpty()) {
+            this.name = name;
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 이름입니다");
+        }
+    }
 }

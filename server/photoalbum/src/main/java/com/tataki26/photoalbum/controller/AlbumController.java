@@ -20,6 +20,12 @@ public class AlbumController {
         return new ResponseEntity<>(albumService.retrieveAlbumById(id), HttpStatus.OK);
     }
 
+    @PutMapping("/albums/{albumId}")
+    public ResponseEntity<AlbumDto> updateAlbum(@PathVariable("albumId") final Long id,
+                                                @RequestBody final AlbumDto albumDto) {
+        return new ResponseEntity<>(albumService.changeName(id, albumDto), HttpStatus.OK);
+    }
+
     @PostMapping("/albums")
     public ResponseEntity<AlbumDto> createAlbum(@RequestBody final AlbumDto albumDto) throws IOException {
         return new ResponseEntity<>(albumService.addNewAlbum(albumDto), HttpStatus.CREATED);
