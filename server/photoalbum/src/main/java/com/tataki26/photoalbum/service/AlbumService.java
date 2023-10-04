@@ -8,19 +8,20 @@ import com.tataki26.photoalbum.repository.AlbumRepository;
 import com.tataki26.photoalbum.repository.PhotoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AlbumService {
@@ -99,6 +100,32 @@ public class AlbumService {
         if (album == null) {
             throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", id));
         }
+        deleteDirectory(PATH_PREFIX + "/photos/original/" + album.getId());
+        deleteDirectory(PATH_PREFIX + "/photos/thumb/" + album.getId());
         albumRepository.deleteById(id);
+    }
+
+    private void deleteDirectory(String filePath) {
+        try {
+            File baseDir = new File(filePath);
+
+            if (!baseDir.exists()) {
+                return;
+            }
+
+            Files.walk(baseDir.toPath())
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach((file) -> {
+                        if (file.isDirectory()) {
+                            log.info(file.getName() + " 폴더 삭제");
+                        } else {
+                            log.info(file.getName() + " 파일 삭제");
+                        }
+                        file.delete();
+                    });
+        } catch (IOException e) {
+            log.error("파일 또는 디렉토리 삭제 중 오류 발생: " + e.getMessage());
+        }
     }
 }
