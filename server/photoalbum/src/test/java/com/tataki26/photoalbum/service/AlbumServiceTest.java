@@ -4,12 +4,14 @@ import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.repository.AlbumRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -104,6 +106,16 @@ class AlbumServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> {
             albumService.changeName(savedDto.getId(), requestDto);
+        });
+    }
+
+    @Test
+    void removePhotosByAlbumId() throws IOException {
+        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
+        albumService.removePhotosByAlbumId(savedDto.getId());
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            albumService.retrieveAlbumById(savedDto.getId());
         });
     }
 }
