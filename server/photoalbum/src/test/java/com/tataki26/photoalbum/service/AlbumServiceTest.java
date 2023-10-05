@@ -29,31 +29,26 @@ class AlbumServiceTest {
 
     private static final String TEST_ALBUM_NAME = "test";
 
-    Album savedAlbum;
-    AlbumDto albumDto;
+    AlbumDto sampleDto;
+    boolean useAfter = true;
 
     @BeforeEach
-    void setUp() {
-        Album album = new Album(TEST_ALBUM_NAME);
-        savedAlbum = albumRepository.save(album);
+    void setUp() throws IOException {
+        AlbumDto requestSampleDto = new AlbumDto();
+        requestSampleDto.setName(TEST_ALBUM_NAME);
 
-        albumDto = new AlbumDto();
-        albumDto.setName(TEST_ALBUM_NAME);
+        sampleDto = albumService.addNewAlbum(requestSampleDto);
     }
 
     @Test
     void retrieveAlbumById() {
-        // get album from persist context
-        AlbumDto albumDto = albumService.retrieveAlbumById(savedAlbum.getId());
-
+        AlbumDto albumDto = albumService.retrieveAlbumById(sampleDto.getId());
         assertEquals(TEST_ALBUM_NAME, albumDto.getName());
     }
 
     @Test
     void retrieveAlbumByName() {
-        // get album from persist context
-        AlbumDto albumDto = albumService.retrieveAlbumByName(savedAlbum.getName());
-
+        AlbumDto albumDto = albumService.retrieveAlbumByName(sampleDto.getName());
         assertEquals(TEST_ALBUM_NAME, albumDto.getName());
     }
 
@@ -67,55 +62,72 @@ class AlbumServiceTest {
     @Test
     void failToRetrieveAlbumByName() {
         assertThrows(EntityNotFoundException.class, () -> {
-            albumService.retrieveAlbumByName("none");
+            albumService.retrieveAlbumByName("");
         });
     }
 
     @Test
     void addNewAlbum() throws IOException {
-        AlbumDto resultDto = albumService.addNewAlbum(albumDto);
-        assertEquals(albumDto.getName(), resultDto.getName());
+        AlbumDto tempDto = new AlbumDto();
+        tempDto.setName(TEST_ALBUM_NAME);
+
+        AlbumDto resultDto = albumService.addNewAlbum(tempDto);
+        assertEquals(tempDto.getName(), resultDto.getName());
+
+        albumService.removePhotosByAlbumId(resultDto.getId());
     }
 
     @Test
     void addNewAlbumShouldCreateDirectories() throws IOException {
-        AlbumDto resultDto = albumService.addNewAlbum(albumDto);
+        AlbumDto tempDto = new AlbumDto();
+        tempDto.setName(TEST_ALBUM_NAME);
+
+        AlbumDto resultDto = albumService.addNewAlbum(tempDto);
 
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/original/" + resultDto.getId())));
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/thumb/" + resultDto.getId())));
+
+        albumService.removePhotosByAlbumId(resultDto.getId());
     }
 
     @Test
     void changeName() throws IOException {
-        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
-
         AlbumDto requestDto = new AlbumDto();
         requestDto.setName("changed");
 
-        AlbumDto updatedAlbumDto = albumService.changeName(savedDto.getId(), requestDto);
+        AlbumDto updatedAlbumDto = albumService.changeName(sampleDto.getId(), requestDto);
 
         assertEquals("changed", updatedAlbumDto.getName());
     }
 
     @Test
     void changeNameWithInvalidName() throws IOException {
-        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
-
         AlbumDto requestDto = new AlbumDto();
         requestDto.setName("");
 
         assertThrows(IllegalArgumentException.class, () -> {
-            albumService.changeName(savedDto.getId(), requestDto);
+            albumService.changeName(sampleDto.getId(), requestDto);
         });
     }
 
     @Test
     void removePhotosByAlbumId() throws IOException {
-        AlbumDto savedDto = albumService.addNewAlbum(albumDto);
-        albumService.removePhotosByAlbumId(savedDto.getId());
+        Long backupId = sampleDto.getId();
+        albumService.removePhotosByAlbumId(backupId);
 
         assertThrows(EntityNotFoundException.class, () -> {
-            albumService.retrieveAlbumById(savedDto.getId());
+            albumService.retrieveAlbumById(backupId);
         });
+
+        useAfter = false;
+    }
+
+    @AfterEach
+    void afterEach() {
+        if (useAfter) {
+            albumService.removePhotosByAlbumId(sampleDto.getId());
+        } else {
+            useAfter = true;
+        }
     }
 }
