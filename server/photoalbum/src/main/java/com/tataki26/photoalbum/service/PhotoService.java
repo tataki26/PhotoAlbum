@@ -66,6 +66,16 @@ public class PhotoService {
 
         // save photo file into server
         savePhotoFile(file, albumId, checkedName);
+
+        // save photo entity into db
+        String originalUrl = "/photos/original/" + albumId + "/" + checkedName;
+        String thumbUrl = "/photos/thumb/" + albumId + "/" + checkedName;
+        // factory method
+        Photo photo = Photo.createPhoto(checkedName, thumbUrl, originalUrl, fileSize, albumOptional.get());
+
+        Photo savedPhoto = photoRepository.save(photo);
+
+        return PhotoMapper.toDto(savedPhoto);
     }
 
     private String checkPhotoName(String originalFileName, Long albumId) {
