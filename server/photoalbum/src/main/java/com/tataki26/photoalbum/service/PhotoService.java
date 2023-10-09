@@ -28,6 +28,9 @@ public class PhotoService {
     private final AlbumRepository albumRepository;
     private final PhotoRepository photoRepository;
 
+    private final String ORIGINAL_PATH = Constants.PATH_PREFIX + "/photos/original";
+    private final String THUMB_PATH = Constants.PATH_PREFIX + "/photos/thumb";
+
     public PhotoDto retrievePhoto(Long albumId, Long photoId) {
         Optional<Album> albumOptional = albumRepository.findById(albumId);
         if (albumOptional.isEmpty()) {
@@ -60,6 +63,9 @@ public class PhotoService {
         String originalFileName = file.getOriginalFilename();
         int fileSize = (int)file.getSize();
         String checkedName = checkPhotoName(originalFileName, albumId);
+
+        // save photo file into server
+        savePhotoFile(file, albumId, checkedName);
     }
 
     private String checkPhotoName(String originalFileName, Long albumId) {
@@ -83,5 +89,29 @@ public class PhotoService {
         String photoName = StringUtils.stripFilenameExtension(name);
         String ext = StringUtils.getFilenameExtension(name);
         return String.format("%s (%d).%s", photoName, count, ext);
+    }
+
+    private void savePhotoFile(MultipartFile file, Long albumId, String fileName) {
+        try {
+            // save original photo file
+            String filePath = albumId + "/" + fileName;
+            Files.copy(file.getInputStream(), Paths.get(ORIGINAL_PATH + "/" + filePath));
+
+            // resize thumb photo
+            BufferedImage thumbImg = Scalr.resize(ImageIO.read(file.getInputStream()), Constants.THUMB_SIZE, Constants.THUMB_SIZE);
+
+            // save resized thumb photo
+            File thumbPhoto = new File(THUMB_PATH + "/" + filePath);
+
+            String ext = StringUtils.getFilenameExtension(fileName);
+            if (ext == null) {
+                throw new IllegalArgumentException("유효하지 않은 확장자입니다");
+            }
+
+            // save thumb photo file
+            ImageIO.write(thumbImg, ext, thumbPhoto);
+        } catch (Exception e) {
+            throw new RuntimeException("파일을 저장할 수 없습니다. 에러: " + e.getMessage());
+        }
     }
 }
