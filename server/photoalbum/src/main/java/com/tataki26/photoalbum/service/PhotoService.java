@@ -56,7 +56,32 @@ public class PhotoService {
             throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
         }
 
+        // set photo name after check if it already exists
         String originalFileName = file.getOriginalFilename();
         int fileSize = (int)file.getSize();
+        String checkedName = checkPhotoName(originalFileName, albumId);
+    }
+
+    private String checkPhotoName(String originalFileName, Long albumId) {
+        int count = 2;
+        String newFileName = "";
+
+        Optional<Photo> photoOptional = photoRepository.findByNameAndAlbum_Id(originalFileName, albumId);
+        while (photoOptional.isPresent()) {
+            newFileName = getNextPhotoName(originalFileName, count++);
+            photoOptional = photoRepository.findByNameAndAlbum_Id(newFileName, albumId);
+        }
+
+        if (newFileName.isEmpty()) {
+            newFileName = originalFileName;
+        }
+
+        return newFileName;
+    }
+
+    private String getNextPhotoName(String name, int count) {
+        String photoName = StringUtils.stripFilenameExtension(name);
+        String ext = StringUtils.getFilenameExtension(name);
+        return String.format("%s (%d).%s", photoName, count, ext);
     }
 }
