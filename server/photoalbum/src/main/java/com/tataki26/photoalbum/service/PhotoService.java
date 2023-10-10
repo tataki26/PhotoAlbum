@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,8 @@ public class PhotoService {
 
     private final String ORIGINAL_PATH = Constants.PATH_PREFIX + "/photos/original";
     private final String THUMB_PATH = Constants.PATH_PREFIX + "/photos/thumb";
+
+    private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "png", "jpeg");
 
     public PhotoDto retrievePhoto(Long albumId, Long photoId) {
         Optional<Album> albumOptional = albumRepository.findById(albumId);
@@ -59,9 +62,15 @@ public class PhotoService {
             throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
         }
 
-        // set photo name after check if it already exists
         String originalFileName = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(originalFileName);
         int fileSize = (int)file.getSize();
+
+        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException(String.format("%s는 지원하지 않는 확장자입니다", ext));
+        }
+
+        // set photo name after check if it already exists
         String checkedName = checkPhotoName(originalFileName, albumId);
 
         // save photo file into server
