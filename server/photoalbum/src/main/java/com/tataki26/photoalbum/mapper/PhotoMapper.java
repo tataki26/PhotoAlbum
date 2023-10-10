@@ -9,6 +9,8 @@ public class PhotoMapper {
         photoDto.setId(photo.getId());
         photoDto.setName(photo.getName());
         photoDto.setUploadedAt(photo.getUploadedAt());
+        photoDto.setThumbUrl(photo.getThumbUrl());
+        photoDto.setOriginalUrl(photo.getOriginalUrl());
         return photoDto;
     }
 }

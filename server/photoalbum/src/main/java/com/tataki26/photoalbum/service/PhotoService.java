@@ -98,7 +98,7 @@ public class PhotoService {
     private String getNextPhotoName(String name, int count) {
         String photoName = StringUtils.stripFilenameExtension(name);
         String ext = StringUtils.getFilenameExtension(name);
-        return String.format("%s (%d).%s", photoName, count, ext);
+        return String.format("%s(%d).%s", photoName, count, ext);
     }
 
     private void savePhotoFile(MultipartFile file, Long albumId, String fileName) {
