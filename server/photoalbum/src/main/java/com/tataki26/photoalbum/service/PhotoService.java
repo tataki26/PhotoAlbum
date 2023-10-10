@@ -23,14 +23,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
+
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
     private final AlbumRepository albumRepository;
     private final PhotoRepository photoRepository;
 
-    private final String ORIGINAL_PATH = Constants.PATH_PREFIX + "/photos/original";
-    private final String THUMB_PATH = Constants.PATH_PREFIX + "/photos/thumb";
+    private final String ORIGINAL_PATH = PATH_PREFIX + "/photos/original";
+    private final String THUMB_PATH = PATH_PREFIX + "/photos/thumb";
 
     private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "png", "jpeg");
 
@@ -166,5 +168,13 @@ public class PhotoService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public File retrievePhotoFile(Long id) {
+        Optional<Photo> photoOptional = photoRepository.findById(id);
+        if (photoOptional.isEmpty()) {
+            throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
+        }
+        return new File(PATH_PREFIX + photoOptional.get().getOriginalUrl());
     }
 }

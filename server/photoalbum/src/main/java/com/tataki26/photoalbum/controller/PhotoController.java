@@ -2,12 +2,15 @@ package com.tataki26.photoalbum.controller;
 
 import com.tataki26.photoalbum.dto.PhotoDto;
 import com.tataki26.photoalbum.service.PhotoService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,4 +38,20 @@ public class PhotoController {
         return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
     }
 
+    @GetMapping("/download")
+    public ResponseEntity<Void> downloadPhotos(@RequestParam("photoIds") Long[] photoIds, HttpServletResponse response) {
+        try {
+            if (photoIds.length == 1) {
+                File file = photoService.retrievePhotoFile(photoIds[0]);
+                OutputStream outputStream = response.getOutputStream();
+                IOUtils.copy(new FileInputStream(file), outputStream);
+                outputStream.close();
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("파일을 찾을 수 없습니다: ", e);
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 다운로드 할 수 없습니다: ", e);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
