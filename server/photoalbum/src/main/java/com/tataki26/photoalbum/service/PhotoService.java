@@ -66,9 +66,7 @@ public class PhotoService {
         String ext = StringUtils.getFilenameExtension(originalFileName);
         int fileSize = (int)file.getSize();
 
-        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
-            throw new IllegalArgumentException(String.format("%s는 지원하지 않는 확장자입니다", ext));
-        }
+        checkValidImageFile(file, ext);
 
         // set photo name after check if it already exists
         String checkedName = checkPhotoName(originalFileName, albumId);
@@ -131,6 +129,42 @@ public class PhotoService {
             ImageIO.write(thumbImg, ext, thumbPhoto);
         } catch (Exception e) {
             throw new RuntimeException("파일을 저장할 수 없습니다. 에러: " + e.getMessage());
+        }
+    }
+
+    private void checkValidImageFile(MultipartFile file, String ext) {
+        if (!ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException(String.format("%s는 지원하지 않는 확장자입니다", ext));
+        }
+
+        if (!isImageFile(file)) {
+            throw new IllegalArgumentException("사진이 아닌 파일입니다");
+        }
+    }
+
+    private boolean isImageFile(MultipartFile file) {
+        try {
+            byte[] buffer = file.getBytes();
+
+            // check magic number
+            // jpg/jpeg: 0xFFD8
+            // png: 0x89504E470D0A1A0A
+            if (buffer.length >= 2) {
+                return (buffer[0] == (byte) 0xFF && (buffer[1] == (byte) 0xD8)// jpg
+                        // png
+                        || (buffer[0] == (byte) 0x89) &&
+                        (buffer[1] == (byte) 0x50) &&
+                        (buffer[2] == (byte) 0x4E) &&
+                        (buffer[3] == (byte) 0x47) &&
+                        (buffer[4] == (byte) 0x0D) &&
+                        (buffer[5] == (byte) 0x0A) &&
+                        (buffer[6] == (byte) 0x1A) &&
+                        (buffer[7] == (byte) 0x0A));
+            }
+
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
