@@ -16,12 +16,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 
@@ -176,5 +179,54 @@ public class PhotoService {
             throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
         }
         return new File(PATH_PREFIX + photoOptional.get().getOriginalUrl());
+    }
+
+    public File retrievePhotoFiles(Long[] ids) throws IOException {
+        List<String> filePaths = new ArrayList<>();
+        for (Long id : ids) {
+            Optional<Photo> photoOptional = photoRepository.findById(id);
+            if (photoOptional.isEmpty()) {
+                throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
+            }
+            String filePath = PATH_PREFIX + photoOptional.get().getOriginalUrl();
+            filePaths.add(filePath);
+        }
+        return createZipFile(filePaths);
+    }
+
+    private File createZipFile(List<String> filePaths) throws IOException {
+        // create zip file with name "download.zip"
+        File zipFile = new File("download.zip");
+
+        // stream to write data into file
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             // stream to create zip file
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+            for (String filePath : filePaths) {
+                File file = new File(filePath);
+                FileInputStream fis = new FileInputStream(file);
+
+                // add current file into zos
+                // ZipEntry: file or directory in zip file
+                zos.putNextEntry(new ZipEntry(file.getName()));
+                byte[] buffer = new byte[1024];
+
+                // length of data
+                // -1 : EOF(End of File)
+                int bytesRead;
+                while ((bytesRead = fis.read(buffer)) != -1) {
+                    // write fis data into zos
+                    zos.write(buffer, 0, bytesRead);
+                }
+
+                // close stream
+                zos.closeEntry();
+                fis.close();
+            }
+        } catch (IOException e) {
+            throw new IOException("zip 파일 생성에 실패했습니다: ", e);
+        }
+        return zipFile;
     }
 }

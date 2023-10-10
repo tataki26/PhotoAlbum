@@ -41,12 +41,15 @@ public class PhotoController {
     @GetMapping("/download")
     public ResponseEntity<Void> downloadPhotos(@RequestParam("photoIds") Long[] photoIds, HttpServletResponse response) {
         try {
+            File file;
             if (photoIds.length == 1) {
-                File file = photoService.retrievePhotoFile(photoIds[0]);
-                OutputStream outputStream = response.getOutputStream();
-                IOUtils.copy(new FileInputStream(file), outputStream);
-                outputStream.close();
+                file = photoService.retrievePhotoFile(photoIds[0]);
+            } else {
+                file = photoService.retrievePhotoFiles(photoIds);
             }
+            OutputStream outputStream = response.getOutputStream();
+            IOUtils.copy(new FileInputStream(file), outputStream);
+            outputStream.close();
         } catch (FileNotFoundException e) {
             throw new RuntimeException("파일을 찾을 수 없습니다: ", e);
         } catch (IOException e) {
