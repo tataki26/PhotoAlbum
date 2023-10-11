@@ -22,7 +22,7 @@ public class Album {
     @CreationTimestamp
     private Date createdAt;
 
-    @OneToMany(mappedBy = "album", cascade = REMOVE)
+    @OneToMany(mappedBy = "album", cascade = ALL)
     private List<Photo> photos;
 
     public Album(String name) {

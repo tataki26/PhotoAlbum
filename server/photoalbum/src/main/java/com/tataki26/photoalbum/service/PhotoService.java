@@ -9,8 +9,10 @@ import com.tataki26.photoalbum.repository.AlbumRepository;
 import com.tataki26.photoalbum.repository.PhotoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +22,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
@@ -37,12 +41,7 @@ public class PhotoService {
     private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "png", "jpeg");
 
     public PhotoDto retrievePhoto(Long albumId, Long photoId) {
-        Optional<Album> albumOptional = albumRepository.findById(albumId);
-        if (albumOptional.isEmpty()) {
-            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
-        }
-
-        Album album = albumOptional.get();
+        Album album = getAlbumById(albumId);
 
         List<Photo> photos = album.getPhotos();
         for (Photo photo : photos) {
@@ -58,12 +57,6 @@ public class PhotoService {
     }
 
     public PhotoDto savePhoto(Long albumId, MultipartFile file) {
-        // get album
-        Optional<Album> albumOptional = albumRepository.findById(albumId);
-        if (albumOptional.isEmpty()) {
-            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
-        }
-
         String originalFileName = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(originalFileName);
         int fileSize = (int)file.getSize();
@@ -80,7 +73,7 @@ public class PhotoService {
         String originalUrl = "/photos/original/" + albumId + "/" + checkedName;
         String thumbUrl = "/photos/thumb/" + albumId + "/" + checkedName;
         // factory method
-        Photo photo = Photo.createPhoto(checkedName, thumbUrl, originalUrl, fileSize, albumOptional.get());
+        Photo photo = Photo.createPhoto(checkedName, thumbUrl, originalUrl, fileSize, getAlbumById(albumId));
 
         Photo savedPhoto = photoRepository.save(photo);
 
@@ -239,4 +232,43 @@ public class PhotoService {
 
         return PhotoMapper.toDtoList(photos);
     }
+
+    @Transactional
+    public List<PhotoDto> movePhotosToAlbum(PhotoDto photoDto) {
+        // get photos in fromAlbum
+        Album fromAlbum = getAlbumById(photoDto.getFromAlbumId());
+        List<Photo> fromPhotoList = fromAlbum.getPhotos();
+
+        List<Long> photoIds = photoDto.getPhotoIds();
+
+        // find photos which matches id
+        List<Photo> selectedPhotos = fromPhotoList.stream()
+                .filter(photo -> photoIds.contains(photo.getId()))
+                .collect(Collectors.toList());
+
+        // get photos in toAlbum
+        Album toAlbum = getAlbumById(photoDto.getToAlbumId());
+        List<Photo> toPhotoList = toAlbum.getPhotos();
+
+        // move photos from fromAlbum to toAlbum
+        for (Photo photo : selectedPhotos) {
+            fromPhotoList.remove(photo);
+            toPhotoList.add(photo);
+        }
+
+        // update db
+        albumRepository.save(fromAlbum);
+        albumRepository.save(toAlbum);
+
+        return PhotoMapper.toDtoList(fromPhotoList);
+    }
+
+    private Album getAlbumById(Long id) {
+        Optional<Album> albumOptional = albumRepository.findById(id);
+        if (albumOptional.isEmpty()) {
+            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
+        }
+        return albumOptional.get();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.tataki26.photoalbum.controller;
 
+import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.dto.PhotoDto;
 import com.tataki26.photoalbum.service.PhotoService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +39,7 @@ public class PhotoController {
         return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("/download")
+    @GetMapping("download")
     public ResponseEntity<Void> downloadPhotos(@RequestParam("photoIds") Long[] photoIds, HttpServletResponse response) {
         try {
             File file;
@@ -64,4 +65,10 @@ public class PhotoController {
                                                        @RequestParam(required = false) final String keyword) {
         return new ResponseEntity<>(photoService.retrievePhotoList(id, sort, keyword), HttpStatus.OK);
     }
+
+    @PutMapping("move")
+    public ResponseEntity<List<PhotoDto>> movePhotos(@RequestBody final PhotoDto photoDto) {
+        return new ResponseEntity<>(photoService.movePhotosToAlbum(photoDto), HttpStatus.OK);
+    }
+
 }

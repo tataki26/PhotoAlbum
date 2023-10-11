@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter @Setter
 public class PhotoDto {
@@ -16,4 +17,8 @@ public class PhotoDto {
     private String originalUrl;
     private Date uploadedAt;
     private int fileSize;
+
+    private Long fromAlbumId;
+    private Long toAlbumId;
+    private List<Long> photoIds;
 }
