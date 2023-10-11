@@ -19,10 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -228,5 +225,18 @@ public class PhotoService {
             throw new IOException("zip 파일 생성에 실패했습니다: ", e);
         }
         return zipFile;
+    }
+
+    public List<PhotoDto> retrievePhotoList(Long id, String sort, String keyword) {
+        List<Photo> photos;
+        if (Objects.equals(sort, "byName")) {
+            photos = photoRepository.findByAlbum_IdAndNameContainingOrderByNameAsc(id, keyword);
+        } else if (Objects.equals(sort, "byDate")) {
+            photos = photoRepository.findByAlbum_IdAndNameContainingOrderByUploadedAtDesc(id, keyword);
+        } else {
+            throw new IllegalArgumentException(sort + "(은)는 사용할 수 없는 정렬 기준입니다");
+        }
+
+        return PhotoMapper.toDtoList(photos);
     }
 }

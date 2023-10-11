@@ -57,4 +57,11 @@ public class PhotoController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<PhotoDto>> getPhotoList(@PathVariable("albumId") final Long id,
+                                                       @RequestParam(required = false, defaultValue = "byDate") final String sort,
+                                                       @RequestParam(required = false) final String keyword) {
+        return new ResponseEntity<>(photoService.retrievePhotoList(id, sort, keyword), HttpStatus.OK);
+    }
 }
