@@ -309,37 +309,31 @@ public class PhotoService {
     }
 
     public void removePhotos(Long albumId, List<Long> photoIds) {
-        Album album = albumRepository.findById(albumId).orElse(null);
-        if (album == null) {
-            throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
-        }
+        for (Long photoId : photoIds) {
+            Photo photo = photoRepository.findById(photoId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId)));
 
-        for (Long id : photoIds) {
             String originalDirectoryPath = ORIGINAL_PATH + albumId + "/";
-            deletePhotoFiles(originalDirectoryPath);
-
             String thumbDirectoryPath = THUMB_PATH + albumId + "/";
-            deletePhotoFiles(thumbDirectoryPath);
 
-            photoRepository.deleteById(id);
+            if (deletePhotoFiles(originalDirectoryPath, photo.getName())
+                    && deletePhotoFiles(thumbDirectoryPath, photo.getName())) {
+                photoRepository.deleteById(photoId);
+            }
         }
     }
 
-    private void deletePhotoFiles(String directoryPath) {
-        File directory = new File(directoryPath);
+    private boolean deletePhotoFiles(String directoryPath, String fileName) {
+        File file = new File(directoryPath + fileName);
 
-        try (Stream<Path> files = Files.list(directory.toPath())) {
-            files.forEach(file -> {
-                if (Files.isRegularFile(file)) {
-                    try {
-                        Files.delete(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException("파일 삭제 중 오류가 발생했습니다." + e);
-                    }
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException("파일 삭제 중 오류가 발생했습니다." + e);
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                return true;
+            } else {
+                throw new RuntimeException("파일 삭제에 실패했습니다: " + file.getName());
+            }
         }
+
+        return false;
     }
 }
