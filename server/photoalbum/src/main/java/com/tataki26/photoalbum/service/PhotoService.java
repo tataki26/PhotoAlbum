@@ -7,7 +7,7 @@ import com.tataki26.photoalbum.dto.PhotoDto;
 import com.tataki26.photoalbum.mapper.PhotoMapper;
 import com.tataki26.photoalbum.repository.AlbumRepository;
 import com.tataki26.photoalbum.repository.PhotoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
@@ -22,7 +22,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -39,6 +38,9 @@ public class PhotoService {
     private final String THUMB_PATH = PATH_PREFIX + "/photos/thumb";
 
     private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "png", "jpeg");
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public PhotoDto retrievePhoto(Long albumId, Long photoId) {
         Album album = getAlbumById(albumId);
@@ -239,28 +241,30 @@ public class PhotoService {
         Album fromAlbum = getAlbumById(photoDto.getFromAlbumId());
         List<Photo> fromPhotoList = fromAlbum.getPhotos();
 
-        List<Long> photoIds = photoDto.getPhotoIds();
-
-        // find photos which matches id
-        List<Photo> selectedPhotos = fromPhotoList.stream()
-                .filter(photo -> photoIds.contains(photo.getId()))
-                .collect(Collectors.toList());
-
-        // get photos in toAlbum
         Album toAlbum = getAlbumById(photoDto.getToAlbumId());
-        List<Photo> toPhotoList = toAlbum.getPhotos();
 
-        // move photos from fromAlbum to toAlbum
-        for (Photo photo : selectedPhotos) {
-            fromPhotoList.remove(photo);
-            toPhotoList.add(photo);
-        }
-
-        // update db
-        albumRepository.save(fromAlbum);
-        albumRepository.save(toAlbum);
+        // move photos from fromAlbum to toAlbum using JPQL
+        updateToAlbumPhotosByFromAlbumAndPhotoIds(photoDto, fromAlbum, toAlbum);
+        deleteMovedPhotos(photoDto);
 
         return PhotoMapper.toDtoList(fromPhotoList);
+    }
+
+    private void updateToAlbumPhotosByFromAlbumAndPhotoIds(PhotoDto photoDto, Album fromAlbum, Album toAlbum) {
+        entityManager.createQuery("UPDATE Photo p SET p.album = :toAlbum " +
+                        "WHERE p.album = :fromAlbum AND p.id IN :photoIds")
+                .setParameter("toAlbum", toAlbum)
+                .setParameter("fromAlbum", fromAlbum)
+                .setParameter("photoIds", photoDto.getPhotoIds())
+                .executeUpdate();
+    }
+
+    private void deleteMovedPhotos(PhotoDto photoDto) {
+        entityManager.createQuery(
+                "DELETE FROM Photo p WHERE p.album.id = :albumId AND p.id IN :photoIds")
+                .setParameter("albumId", photoDto.getFromAlbumId())
+                .setParameter("photoIds", photoDto.getPhotoIds())
+                .executeUpdate();
     }
 
     private Album getAlbumById(Long id) {
