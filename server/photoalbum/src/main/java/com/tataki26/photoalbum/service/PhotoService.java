@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,8 +37,8 @@ public class PhotoService {
     private final AlbumRepository albumRepository;
     private final PhotoRepository photoRepository;
 
-    private final String ORIGINAL_PATH = PATH_PREFIX + "/photos/original";
-    private final String THUMB_PATH = PATH_PREFIX + "/photos/thumb";
+    private final String ORIGINAL_PATH = PATH_PREFIX + "/photos/original/";
+    private final String THUMB_PATH = PATH_PREFIX + "/photos/thumb/";
 
     private final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "png", "jpeg");
 
@@ -111,13 +112,13 @@ public class PhotoService {
         try {
             // save original photo file
             String filePath = albumId + "/" + fileName;
-            Files.copy(file.getInputStream(), Paths.get(ORIGINAL_PATH + "/" + filePath));
+            Files.copy(file.getInputStream(), Paths.get(ORIGINAL_PATH + filePath));
 
             // resize thumb photo
             BufferedImage thumbImg = Scalr.resize(ImageIO.read(file.getInputStream()), Constants.THUMB_SIZE, Constants.THUMB_SIZE);
 
             // save resized thumb photo
-            File thumbPhoto = new File(THUMB_PATH + "/" + filePath);
+            File thumbPhoto = new File(THUMB_PATH + filePath);
 
             String ext = StringUtils.getFilenameExtension(fileName);
             if (ext == null) {
@@ -252,13 +253,13 @@ public class PhotoService {
         deleteMovedPhotos(photoDto);
 
         // move photo files from fromAlbum to toAlbum
-        String sourceOriginalDirectoryPath = PATH_PREFIX + "/photos" + "/original/" + fromAlbumId + "/";
-        String targetOriginalDirectoryPath = PATH_PREFIX + "/photos" + "/original/" + toAlbumId + "/";
+        String sourceOriginalDirectoryPath = ORIGINAL_PATH + fromAlbumId + "/";
+        String targetOriginalDirectoryPath = ORIGINAL_PATH + toAlbumId + "/";
 
         movePhotoFiles(sourceOriginalDirectoryPath, targetOriginalDirectoryPath);
 
-        String sourceThumbDirectoryPath = PATH_PREFIX + "/photos" + "/thumb/" + fromAlbumId + "/";
-        String targetThumbDirectoryPath = PATH_PREFIX + "/photos" + "/thumb/" + toAlbumId + "/";
+        String sourceThumbDirectoryPath = THUMB_PATH + fromAlbumId + "/";
+        String targetThumbDirectoryPath = THUMB_PATH + toAlbumId + "/";
 
         movePhotoFiles(sourceThumbDirectoryPath, targetThumbDirectoryPath);
 
@@ -304,6 +305,41 @@ public class PhotoService {
                     throw new RuntimeException("파일 이동 중 오류가 발생했습니다." + e);
                 }
             }
+        }
+    }
+
+    public void removePhotos(Long albumId, List<Long> photoIds) {
+        Album album = albumRepository.findById(albumId).orElse(null);
+        if (album == null) {
+            throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", albumId));
+        }
+
+        for (Long id : photoIds) {
+            String originalDirectoryPath = ORIGINAL_PATH + albumId + "/";
+            deletePhotoFiles(originalDirectoryPath);
+
+            String thumbDirectoryPath = THUMB_PATH + albumId + "/";
+            deletePhotoFiles(thumbDirectoryPath);
+
+            photoRepository.deleteById(id);
+        }
+    }
+
+    private void deletePhotoFiles(String directoryPath) {
+        File directory = new File(directoryPath);
+
+        try (Stream<Path> files = Files.list(directory.toPath())) {
+            files.forEach(file -> {
+                if (Files.isRegularFile(file)) {
+                    try {
+                        Files.delete(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException("파일 삭제 중 오류가 발생했습니다." + e);
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 중 오류가 발생했습니다." + e);
         }
     }
 }

@@ -71,4 +71,11 @@ public class PhotoController {
         return new ResponseEntity<>(photoService.movePhotosToAlbum(photoDto), HttpStatus.OK);
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> deletePhoto(@PathVariable("albumId") final Long albumId,
+                                            @RequestBody final PhotoDto photoDto) {
+        photoService.removePhotos(albumId, photoDto.getPhotoIds());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }
