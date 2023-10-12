@@ -95,7 +95,7 @@ public class AlbumService {
         return AlbumMapper.toDto(albumRepository.save(album));
     }
 
-    public void removePhotosByAlbumId(Long id) {
+    public void removeAlbum(Long id) {
         Album album = albumRepository.findById(id).orElse(null);
         if (album == null) {
             throw new NoSuchElementException(String.format("ID %d로 조회된 앨범이 없습니다", id));

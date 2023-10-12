@@ -39,8 +39,8 @@ public class AlbumController {
     }
 
     @DeleteMapping("{albumId}")
-    public ResponseEntity<Void> deletePhotos(@PathVariable("albumId") final Long id) {
-        albumService.removePhotosByAlbumId(id);
+    public ResponseEntity<Void> deleteAlbum(@PathVariable("albumId") final Long id) {
+        albumService.removeAlbum(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -1,6 +1,5 @@
 package com.tataki26.photoalbum.service;
 
-import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.repository.AlbumRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -74,7 +72,7 @@ class AlbumServiceTest {
         AlbumDto resultDto = albumService.addNewAlbum(tempDto);
         assertEquals(tempDto.getName(), resultDto.getName());
 
-        albumService.removePhotosByAlbumId(resultDto.getId());
+        albumService.removeAlbum(resultDto.getId());
     }
 
     @Test
@@ -87,11 +85,11 @@ class AlbumServiceTest {
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/original/" + resultDto.getId())));
         assertTrue(Files.exists(Paths.get(PATH_PREFIX + "/photos/thumb/" + resultDto.getId())));
 
-        albumService.removePhotosByAlbumId(resultDto.getId());
+        albumService.removeAlbum(resultDto.getId());
     }
 
     @Test
-    void changeName() throws IOException {
+    void changeName() {
         AlbumDto requestDto = new AlbumDto();
         requestDto.setName("changed");
 
@@ -101,7 +99,7 @@ class AlbumServiceTest {
     }
 
     @Test
-    void changeNameWithInvalidName() throws IOException {
+    void changeNameWithInvalidName() {
         AlbumDto requestDto = new AlbumDto();
         requestDto.setName("");
 
@@ -111,9 +109,9 @@ class AlbumServiceTest {
     }
 
     @Test
-    void removePhotosByAlbumId() throws IOException {
+    void removePhotosByAlbumId() {
         Long backupId = sampleDto.getId();
-        albumService.removePhotosByAlbumId(backupId);
+        albumService.removeAlbum(backupId);
 
         assertThrows(EntityNotFoundException.class, () -> {
             albumService.retrieveAlbumById(backupId);
@@ -125,7 +123,7 @@ class AlbumServiceTest {
     @AfterEach
     void afterEach() {
         if (useAfter) {
-            albumService.removePhotosByAlbumId(sampleDto.getId());
+            albumService.removeAlbum(sampleDto.getId());
         } else {
             useAfter = true;
         }
