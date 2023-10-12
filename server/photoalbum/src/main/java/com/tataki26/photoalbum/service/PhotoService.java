@@ -20,7 +20,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -238,16 +240,37 @@ public class PhotoService {
     @Transactional
     public List<PhotoDto> movePhotosToAlbum(PhotoDto photoDto) {
         // get photos in fromAlbum
-        Album fromAlbum = getAlbumById(photoDto.getFromAlbumId());
+        Long fromAlbumId = photoDto.getFromAlbumId();
+        Album fromAlbum = getAlbumById(fromAlbumId);
         List<Photo> fromPhotoList = fromAlbum.getPhotos();
 
+        Long toAlbumId = photoDto.getToAlbumId();
         Album toAlbum = getAlbumById(photoDto.getToAlbumId());
 
         // move photos from fromAlbum to toAlbum using JPQL
         updateToAlbumPhotosByFromAlbumAndPhotoIds(photoDto, fromAlbum, toAlbum);
         deleteMovedPhotos(photoDto);
 
+        // move photo files from fromAlbum to toAlbum
+        String sourceOriginalDirectoryPath = PATH_PREFIX + "/photos" + "/original/" + fromAlbumId + "/";
+        String targetOriginalDirectoryPath = PATH_PREFIX + "/photos" + "/original/" + toAlbumId + "/";
+
+        movePhotoFiles(sourceOriginalDirectoryPath, targetOriginalDirectoryPath);
+
+        String sourceThumbDirectoryPath = PATH_PREFIX + "/photos" + "/thumb/" + fromAlbumId + "/";
+        String targetThumbDirectoryPath = PATH_PREFIX + "/photos" + "/thumb/" + toAlbumId + "/";
+
+        movePhotoFiles(sourceThumbDirectoryPath, targetThumbDirectoryPath);
+
         return PhotoMapper.toDtoList(fromPhotoList);
+    }
+
+    private Album getAlbumById(Long id) {
+        Optional<Album> albumOptional = albumRepository.findById(id);
+        if (albumOptional.isEmpty()) {
+            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
+        }
+        return albumOptional.get();
     }
 
     private void updateToAlbumPhotosByFromAlbumAndPhotoIds(PhotoDto photoDto, Album fromAlbum, Album toAlbum) {
@@ -267,12 +290,20 @@ public class PhotoService {
                 .executeUpdate();
     }
 
-    private Album getAlbumById(Long id) {
-        Optional<Album> albumOptional = albumRepository.findById(id);
-        if (albumOptional.isEmpty()) {
-            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
-        }
-        return albumOptional.get();
-    }
+    private void movePhotoFiles(String sourceOriginalDirectoryPath, String targetOriginalDirectoryPath) {
+        File sourceOriginalDirectory = new File(sourceOriginalDirectoryPath);
 
+        for (File sourceFile : sourceOriginalDirectory.listFiles()) {
+            if (sourceFile.isFile()) {
+                Path sourcePath = sourceFile.toPath();
+                Path targetPath = new File(targetOriginalDirectoryPath + sourceFile.getName()).toPath();
+                try {
+                    Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    Files.delete(sourcePath);
+                } catch (IOException e) {
+                    throw new RuntimeException("파일 이동 중 오류가 발생했습니다." + e);
+                }
+            }
+        }
+    }
 }
