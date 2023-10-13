@@ -306,6 +306,10 @@ public class PhotoService {
             Photo photo = photoRepository.findById(photoId)
                     .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId)));
 
+            if (photo.getAlbum().getId() != albumId) {
+                throw new IllegalArgumentException(String.format("앨범에 사진 ID %d가 존재하지 않습니다", photoId));
+            }
+
             String originalDirectoryPath = ORIGINAL_PATH + albumId + "/";
             String thumbDirectoryPath = THUMB_PATH + albumId + "/";
 
