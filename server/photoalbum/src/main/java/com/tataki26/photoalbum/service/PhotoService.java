@@ -61,6 +61,11 @@ public class PhotoService {
         throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId));
     }
 
+    private Album getAlbumById(Long albumId) {
+        return albumRepository.findById(albumId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId)));
+    }
+
     public PhotoDto savePhoto(Long albumId, MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(originalFileName);
@@ -239,73 +244,61 @@ public class PhotoService {
     }
 
     @Transactional
-    public List<PhotoDto> movePhotosToAlbum(PhotoDto photoDto) {
-        // get photos in fromAlbum
-        Long fromAlbumId = photoDto.getFromAlbumId();
-        Album fromAlbum = getAlbumById(fromAlbumId);
-        List<Photo> fromPhotoList = fromAlbum.getPhotos();
+    public List<PhotoDto> movePhotosBetweenAlbums(PhotoDto photoDto) {
+        try {
+            List<Long> photoIds = photoDto.getPhotoIds();
+            Long fromAlbumId = photoDto.getFromAlbumId();
+            Album fromAlbum = getAlbumById(fromAlbumId);
+            Album toAlbum = getAlbumById(photoDto.getToAlbumId());
 
-        Long toAlbumId = photoDto.getToAlbumId();
-        Album toAlbum = getAlbumById(photoDto.getToAlbumId());
+            movePhotoFiles(photoIds, fromAlbumId, toAlbum);
 
-        // move photos from fromAlbum to toAlbum using JPQL
-        updateToAlbumPhotosByFromAlbumAndPhotoIds(photoDto, fromAlbum, toAlbum);
-        deleteMovedPhotos(photoDto);
+            updateToAlbumPhotos(photoIds, fromAlbum, toAlbum);
+            deleteMovedPhotos(photoIds, fromAlbumId);
 
-        // move photo files from fromAlbum to toAlbum
-        String sourceOriginalDirectoryPath = ORIGINAL_PATH + fromAlbumId + "/";
-        String targetOriginalDirectoryPath = ORIGINAL_PATH + toAlbumId + "/";
-
-        movePhotoFiles(sourceOriginalDirectoryPath, targetOriginalDirectoryPath);
-
-        String sourceThumbDirectoryPath = THUMB_PATH + fromAlbumId + "/";
-        String targetThumbDirectoryPath = THUMB_PATH + toAlbumId + "/";
-
-        movePhotoFiles(sourceThumbDirectoryPath, targetThumbDirectoryPath);
-
-        return PhotoMapper.toDtoList(fromPhotoList);
-    }
-
-    private Album getAlbumById(Long id) {
-        Optional<Album> albumOptional = albumRepository.findById(id);
-        if (albumOptional.isEmpty()) {
-            throw new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", id));
+            return PhotoMapper.toDtoList(fromAlbum.getPhotos());
+        } catch (Exception e) {
+            throw new RuntimeException("사진 이동에 실패했습니다: " + e.getMessage(), e);
         }
-        return albumOptional.get();
     }
 
-    private void updateToAlbumPhotosByFromAlbumAndPhotoIds(PhotoDto photoDto, Album fromAlbum, Album toAlbum) {
+    private void movePhotoFiles(List<Long> photoIds, Long fromAlbumId, Album toAlbum) {
+        for (Long photoId : photoIds) {
+            Photo photo = photoRepository.findById(photoId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId)));
+            String photoName = photo.getName();
+
+            movePhotoFile(fromAlbumId, toAlbum.getId(), photoName, ORIGINAL_PATH);
+            movePhotoFile(fromAlbumId, toAlbum.getId(), photoName, THUMB_PATH);
+        }
+    }
+
+    private void movePhotoFile(Long fromAlbumId, Long toAlbumId, String photoName, String basePath) {
+        String sourceFilePath = basePath + fromAlbumId + "/" + photoName;
+        String targetFilePath = basePath + toAlbumId + "/" + photoName;
+
+        try {
+            Files.move(Paths.get(sourceFilePath), Paths.get(targetFilePath), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 이동에 실패했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateToAlbumPhotos(List<Long> photoIds, Album fromAlbum, Album toAlbum) {
         entityManager.createQuery("UPDATE Photo p SET p.album = :toAlbum " +
                         "WHERE p.album = :fromAlbum AND p.id IN :photoIds")
                 .setParameter("toAlbum", toAlbum)
                 .setParameter("fromAlbum", fromAlbum)
-                .setParameter("photoIds", photoDto.getPhotoIds())
+                .setParameter("photoIds", photoIds)
                 .executeUpdate();
     }
 
-    private void deleteMovedPhotos(PhotoDto photoDto) {
+    private void deleteMovedPhotos(List<Long> photoIds, Long fromAlbumId) {
         entityManager.createQuery(
-                "DELETE FROM Photo p WHERE p.album.id = :albumId AND p.id IN :photoIds")
-                .setParameter("albumId", photoDto.getFromAlbumId())
-                .setParameter("photoIds", photoDto.getPhotoIds())
+                        "DELETE FROM Photo p WHERE p.album.id = :albumId AND p.id IN :photoIds")
+                .setParameter("albumId", fromAlbumId)
+                .setParameter("photoIds", photoIds)
                 .executeUpdate();
-    }
-
-    private void movePhotoFiles(String sourceOriginalDirectoryPath, String targetOriginalDirectoryPath) {
-        File sourceOriginalDirectory = new File(sourceOriginalDirectoryPath);
-
-        for (File sourceFile : sourceOriginalDirectory.listFiles()) {
-            if (sourceFile.isFile()) {
-                Path sourcePath = sourceFile.toPath();
-                Path targetPath = new File(targetOriginalDirectoryPath + sourceFile.getName()).toPath();
-                try {
-                    Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                    Files.delete(sourcePath);
-                } catch (IOException e) {
-                    throw new RuntimeException("파일 이동 중 오류가 발생했습니다." + e);
-                }
-            }
-        }
     }
 
     public void removePhotos(Long albumId, List<Long> photoIds) {

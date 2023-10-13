@@ -68,7 +68,7 @@ public class PhotoController {
 
     @PutMapping("move")
     public ResponseEntity<List<PhotoDto>> movePhotos(@RequestBody final PhotoDto photoDto) {
-        return new ResponseEntity<>(photoService.movePhotosToAlbum(photoDto), HttpStatus.OK);
+        return new ResponseEntity<>(photoService.movePhotosBetweenAlbums(photoDto), HttpStatus.OK);
     }
 
     @DeleteMapping
