@@ -2,7 +2,6 @@ package com.tataki26.photoalbum.domain;
 
 import com.tataki26.photoalbum.dto.UserDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,6 +12,7 @@ import java.util.Date;
 @Entity
 @NoArgsConstructor
 @Getter
+@Table(name="users")
 public class User {
     @Id @GeneratedValue
     @Column(name = "user_id", unique = true, nullable = false)
