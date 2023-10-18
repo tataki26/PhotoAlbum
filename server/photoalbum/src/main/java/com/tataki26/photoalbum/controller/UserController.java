@@ -1,6 +1,5 @@
 package com.tataki26.photoalbum.controller;
 
-import com.tataki26.photoalbum.domain.User;
 import com.tataki26.photoalbum.dto.UserDto;
 import com.tataki26.photoalbum.service.UserService;
 import jakarta.validation.Valid;
@@ -16,7 +15,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody final UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody final UserDto userDto) {
         return new ResponseEntity<>(userService.addNewUser(userDto), HttpStatus.CREATED);
     }
 }

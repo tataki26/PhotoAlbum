@@ -2,10 +2,10 @@ package com.tataki26.photoalbum.domain;
 
 import com.tataki26.photoalbum.dto.UserDto;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Email;
 
 import java.util.Date;
 
