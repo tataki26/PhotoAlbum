@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @NoArgsConstructor
@@ -21,6 +22,9 @@ public class Album {
     private String name;
     @CreationTimestamp
     private Date createdAt;
+
+    @ManyToOne(fetch = LAZY)
+    private User user;
 
     @OneToMany(mappedBy = "album", cascade = ALL)
     private List<Photo> photos;
