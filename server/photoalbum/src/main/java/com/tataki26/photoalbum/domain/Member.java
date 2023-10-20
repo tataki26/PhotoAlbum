@@ -3,14 +3,19 @@ package com.tataki26.photoalbum.domain;
 import com.tataki26.photoalbum.dto.MemberDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Table(name="member")
 public class Member {
@@ -30,29 +35,11 @@ public class Member {
         this.loginAt = loginAt;
     }
 
-    public static Member createMember(MemberDto memberDto) {
-        String name = memberDto.getName();
-        String email = memberDto.getEmail();
-        String password = memberDto.getPassword();
-
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("회원 이름은 생략할 수 없습니다.");
-        }
-
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("회원 이메일은 생략할 수 없습니다.");
-        }
-
-        if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("비밀 번호는 생략할 수 없습니다.");
-        }
-
-        Member member = new Member();
-
-        member.name = name;
-        member.email = email;
-        member.password = password;
-
-        return member;
+    public static Member createMember(MemberDto memberDto, PasswordEncoder encoder) {
+        return Member.builder()
+                .name(memberDto.getName())
+                .email(memberDto.getEmail())
+                .password(encoder.encode(memberDto.getPassword()))
+                .build();
     }
 }
