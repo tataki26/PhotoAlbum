@@ -1,6 +1,6 @@
 package com.tataki26.photoalbum.domain;
 
-import com.tataki26.photoalbum.dto.UserDto;
+import com.tataki26.photoalbum.dto.MemberDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
@@ -12,12 +12,12 @@ import java.util.Date;
 @Entity
 @NoArgsConstructor
 @Getter
-@Table(name="users")
-public class User {
+@Table(name="member")
+public class Member {
     @Id @GeneratedValue
-    @Column(name = "user_id", unique = true, nullable = false)
+    @Column(name = "member_id", unique = true)
     private Long id;
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "member_name", nullable = false)
     private String name;
     @Email
     private String email;
@@ -30,10 +30,10 @@ public class User {
         this.loginAt = loginAt;
     }
 
-    public static User createUser(UserDto userDto) {
-        String name = userDto.getName();
-        String email = userDto.getEmail();
-        String password = userDto.getPassword();
+    public static Member createMember(MemberDto memberDto) {
+        String name = memberDto.getName();
+        String email = memberDto.getEmail();
+        String password = memberDto.getPassword();
 
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("회원 이름은 생략할 수 없습니다.");
@@ -47,12 +47,12 @@ public class User {
             throw new IllegalArgumentException("비밀 번호는 생략할 수 없습니다.");
         }
 
-        User user = new User();
+        Member member = new Member();
 
-        user.name = name;
-        user.email = email;
-        user.password = password;
+        member.name = name;
+        member.email = email;
+        member.password = password;
 
-        return user;
+        return member;
     }
 }

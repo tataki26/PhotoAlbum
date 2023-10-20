@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -24,7 +24,7 @@ public class Album {
     private Date createdAt;
 
     @ManyToOne(fetch = LAZY)
-    private User user;
+    private Member member;
 
     @OneToMany(mappedBy = "album", cascade = ALL)
     private List<Photo> photos;

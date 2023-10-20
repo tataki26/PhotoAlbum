@@ -11,13 +11,13 @@ import lombok.Setter;
 import java.util.Date;
 
 @Getter @Setter
-public class UserDto {
-    @JsonProperty("userId")
+public class MemberDto {
+    @JsonProperty("memberId")
     private Long id;
     @NotNull
     @Size(min = 6, max = 12, message = "아이디는 6자 이상, 12자 이하이어야 합니다")
     @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "아이디는 영문자와 숫자만 허용됩니다")
-    @JsonProperty("userName")
+    @JsonProperty("memberName")
     private String name;
     @Email
     private String email;
