@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -18,5 +20,13 @@ public class MemberService {
         Member member = Member.createMember(memberDto, encoder);
         Member savedMember = memberRepository.save(member);
         return MemberMapper.toDto(savedMember);
+    }
+
+    public MemberDto authenticateMember(MemberDto memberDto) {
+        Member member = memberRepository.findByEmail(memberDto.getEmail())
+                .filter(it -> encoder.matches(memberDto.getPassword(), it.getPassword()))
+                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다"));
+        member.setLoginAt(new Date());
+        return MemberMapper.toDto(member);
     }
 }

@@ -13,14 +13,14 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class JwtSecurityConfiguration {
-    private final String allowedUrl = "/users";
+    private final String[] allowedUrls = {"/users", "/sign-in"};
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 // apply authentication to all requests
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers(allowedUrl).permitAll()
+                        request.requestMatchers(allowedUrls).permitAll()
                                .requestMatchers(PathRequest.toH2Console()).permitAll()
                                .anyRequest().authenticated()
                 )

@@ -12,13 +12,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping
+    @PostMapping("/users")
     public ResponseEntity<MemberDto> createMember(@Valid @RequestBody final MemberDto memberDto) {
         return new ResponseEntity<>(memberService.addNewMember(memberDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/sign-in")
+    public ResponseEntity<MemberDto> signIn(@Valid @RequestBody final MemberDto memberDto) {
+        return new ResponseEntity<>(memberService.authenticateMember(memberDto), HttpStatus.OK);
     }
 }

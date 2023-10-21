@@ -25,7 +25,9 @@ public class Member {
     @Column(name = "member_name", nullable = false)
     private String name;
     @Email
+    @Column(nullable = false)
     private String email;
+    @Column(nullable = false)
     private String password;
     @CreationTimestamp
     private Date createdAt;

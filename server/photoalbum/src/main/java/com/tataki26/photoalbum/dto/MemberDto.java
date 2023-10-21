@@ -14,11 +14,11 @@ import java.util.Date;
 public class MemberDto {
     @JsonProperty("memberId")
     private Long id;
-    @NotNull
-    @Size(min = 6, max = 12, message = "아이디는 6자 이상, 12자 이하이어야 합니다")
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "아이디는 영문자와 숫자만 허용됩니다")
+    // @Size(min = 6, max = 12, message = "아이디는 6자 이상, 12자 이하이어야 합니다")
+    // @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "아이디는 영문자와 숫자만 허용됩니다")
     @JsonProperty("memberName")
     private String name;
+    @NotNull
     @Email
     private String email;
     @NotNull
