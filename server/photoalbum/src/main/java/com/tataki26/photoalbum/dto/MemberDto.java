@@ -27,4 +27,5 @@ public class MemberDto {
     private String password;
     private Date createdAt;
     private Date loginAt;
+    private String token;
 }

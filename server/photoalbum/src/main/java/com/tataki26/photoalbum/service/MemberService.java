@@ -15,6 +15,7 @@ import java.util.Date;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
+    private final TokenProvider tokenProvider;
 
     public MemberDto addNewMember(MemberDto memberDto) {
         Member member = Member.createMember(memberDto, encoder);
@@ -27,6 +28,11 @@ public class MemberService {
                 .filter(it -> encoder.matches(memberDto.getPassword(), it.getPassword()))
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다"));
         member.setLoginAt(new Date());
-        return MemberMapper.toDto(member);
+
+        MemberDto convertedDto = MemberMapper.toDto(member);
+        String userSpecification = String.format("%s:%s", member.getId(), member.getRole());
+        convertedDto.setToken(tokenProvider.createToken(userSpecification));
+
+        return convertedDto;
     }
 }

@@ -1,6 +1,7 @@
 package com.tataki26.photoalbum.domain;
 
 import com.tataki26.photoalbum.dto.MemberDto;
+import com.tataki26.photoalbum.security.MemberRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,8 @@ public class Member {
     @CreationTimestamp
     private Date createdAt;
     private Date loginAt;
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
 
     public void setLoginAt(Date loginAt) {
         this.loginAt = loginAt;

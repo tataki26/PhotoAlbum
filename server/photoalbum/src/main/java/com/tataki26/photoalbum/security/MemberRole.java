@@ -1,5 +1,5 @@
 package com.tataki26.photoalbum.security;
 
-public enum UserRoles {
+public enum MemberRole {
     USER, ADMIN
 }
