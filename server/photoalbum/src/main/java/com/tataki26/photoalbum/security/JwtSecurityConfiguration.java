@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +37,7 @@ public class JwtSecurityConfiguration {
                 // apply authentication to all requests
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(allowedUrls).permitAll()
-                               .requestMatchers(PathRequest.toH2Console()).permitAll()
+                               // .requestMatchers(PathRequest.toH2Console()).permitAll()
                                .anyRequest().authenticated()
                 )
                 // set session stateless
@@ -103,4 +104,11 @@ public class JwtSecurityConfiguration {
     public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
         return new NimbusJwtEncoder(jwkSource);
     }
+
+    /*
+    @Bean
+    public H2ConsoleProperties h2ConsoleProperties() {
+        return new H2ConsoleProperties();
+    }
+    */
 }
