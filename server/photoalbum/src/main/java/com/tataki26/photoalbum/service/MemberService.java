@@ -7,10 +7,12 @@ import com.tataki26.photoalbum.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -34,5 +36,12 @@ public class MemberService {
         convertedDto.setToken(tokenProvider.createToken(userSpecification));
 
         return convertedDto;
+    }
+
+    public void changePassword(Long id, MemberDto memberDto) {
+        Member member = memberRepository.findById(id)
+                .filter(it -> encoder.matches(memberDto.getPassword(), it.getPassword()))
+                .orElseThrow(() -> new IllegalArgumentException("비밀번호가 일치하지 않습니다"));
+        member.updatePassword(memberDto, encoder);
     }
 }

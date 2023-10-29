@@ -6,10 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping
@@ -20,6 +17,13 @@ public class MemberController {
     @PostMapping("/users")
     public ResponseEntity<MemberDto> createMember(@Valid @RequestBody final MemberDto memberDto) {
         return new ResponseEntity<>(memberService.addNewMember(memberDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/users/{userId}/password")
+    public ResponseEntity<Void> updatePassword(@PathVariable("userId") final Long id,
+                                               @Valid @RequestBody final MemberDto memberDto) {
+        memberService.changePassword(id, memberDto);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/sign-in")

@@ -47,4 +47,8 @@ public class Member {
                 .password(encoder.encode(memberDto.getPassword()))
                 .build();
     }
+
+    public void updatePassword(MemberDto memberDto, PasswordEncoder encoder) {
+        this.password = encoder.encode(memberDto.getNewPassword());
+    }
 }
