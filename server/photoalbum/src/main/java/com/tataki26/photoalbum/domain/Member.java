@@ -35,9 +35,21 @@ public class Member {
     private Date loginAt;
     @Enumerated(EnumType.STRING)
     private MemberRole role;
+    @Enumerated(EnumType.STRING)
+    private MemberStatus status;
+    @CreationTimestamp
+    private Date deactivatedAt;
 
     public void setLoginAt(Date loginAt) {
         this.loginAt = loginAt;
+    }
+
+    public void setStatus(MemberStatus status) {
+        this.status = status;
+    }
+
+    public void setDeactivatedAt(Date deactivatedAt) {
+        this.deactivatedAt = deactivatedAt;
     }
 
     public static Member createMember(MemberDto memberDto, PasswordEncoder encoder) {

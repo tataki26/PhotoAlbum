@@ -26,6 +26,13 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PatchMapping("/users/{userId}/status")
+    public ResponseEntity<Void> deactivateMember(@PathVariable("userId") final Long id,
+                                                 @Valid @RequestBody final MemberDto memberDto) {
+        memberService.changeMemberStatus(id, memberDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/sign-in")
     public ResponseEntity<MemberDto> signIn(@Valid @RequestBody final MemberDto memberDto) {
         return new ResponseEntity<>(memberService.authenticateMember(memberDto), HttpStatus.OK);
