@@ -1,10 +1,17 @@
 import { useState } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import './PhotoAlbum.css'
 
 export default function PhotoAlbum() {
     return (
         <div className="PhotoAlbum">
-            <LoginComponent />
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<LoginComponent />}></Route>
+                    <Route path="/login" element={<LoginComponent />}></Route>
+                    <Route path="/welcome" element={<WelcomeComponent />}></Route>
+                </Routes>
+            </BrowserRouter>
         </div>
     )
 }
@@ -15,6 +22,8 @@ function LoginComponent() {
 
     const [showErrorMessage, setShowErrorMessage] = useState(false);
 
+    const navigate = useNavigate();
+
     function handleEmailChange(e) {
         setEmail(e.target.value);
     }
@@ -24,11 +33,12 @@ function LoginComponent() {
     }
 
     function handleSubmit() {
-        if (email !== "abc@test.com" || password !== "1234") {
-            setShowErrorMessage(true);
+        if (email === "abc@test.com" && password === "1234") {
+            setShowErrorMessage(false);
+            navigate('/welcome');
         }
         else {
-            setShowErrorMessage(false);
+            setShowErrorMessage(true);
         }
     }
 
@@ -46,6 +56,14 @@ function LoginComponent() {
                     <button type="button" name="login" onClick={handleSubmit}>로그인</button>
                 </div>
             </div>
+        </div>
+    )
+}
+
+function WelcomeComponent() {
+    return (
+        <div className="Welcome">
+            Welcome Component
         </div>
     )
 }
