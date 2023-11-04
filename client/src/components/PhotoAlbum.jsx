@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import './PhotoAlbum.css'
 
 export default function PhotoAlbum() {
@@ -9,7 +9,7 @@ export default function PhotoAlbum() {
                 <Routes>
                     <Route path="/" element={<LoginComponent />}></Route>
                     <Route path="/login" element={<LoginComponent />}></Route>
-                    <Route path="/welcome" element={<WelcomeComponent />}></Route>
+                    <Route path="/welcome/:username" element={<WelcomeComponent />}></Route>
                     <Route path="*" element={<ErrorComponent />}></Route>
                 </Routes>
             </BrowserRouter>
@@ -36,7 +36,9 @@ function LoginComponent() {
     function handleSubmit() {
         if (email === "abc@test.com" && password === "1234") {
             setShowErrorMessage(false);
-            navigate('/welcome');
+            const atIndex = email.indexOf("@");
+            const username = email.slice(0, atIndex);
+            navigate(`/welcome/${username}`);
         }
         else {
             setShowErrorMessage(true);
@@ -63,9 +65,11 @@ function LoginComponent() {
 }
 
 function WelcomeComponent() {
+    const {username} = useParams(); // {username} == params.username
+
     return (
         <div className="Welcome">
-            <h1>환영합니다!</h1>
+            <h1>환영합니다, {username}!</h1>
             <div>Welcome Component</div> 
         </div>
     )
