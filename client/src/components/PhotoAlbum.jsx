@@ -10,6 +10,7 @@ export default function PhotoAlbum() {
                     <Route path="/" element={<LoginComponent />}></Route>
                     <Route path="/login" element={<LoginComponent />}></Route>
                     <Route path="/welcome" element={<WelcomeComponent />}></Route>
+                    <Route path="*" element={<ErrorComponent />}></Route>
                 </Routes>
             </BrowserRouter>
         </div>
@@ -44,6 +45,7 @@ function LoginComponent() {
 
     return (
         <div className="Login">
+            <h1>로그인</h1>
             {showErrorMessage && <div className="errorMessage">아이디 또는 비밀번호가 일치하지 않습니다</div>}
             <div className="LoginForm">
                 <div>
@@ -63,7 +65,20 @@ function LoginComponent() {
 function WelcomeComponent() {
     return (
         <div className="Welcome">
-            Welcome Component
+            <h1>환영합니다!</h1>
+            <div>Welcome Component</div> 
+        </div>
+    )
+}
+
+function ErrorComponent() {
+    return (
+        <div className="ErrorComponent">
+            <h1>** 존재하지 않는 페이지입니다 **</h1>
+            <div>
+                404 에러가 발생했습니다<br />
+                123-456으로 문의 바랍니다
+            </div>
         </div>
     )
 }
