@@ -1,16 +1,17 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import './PhotoAlbum.css'
+import { BrowserRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
+// import './PhotoAlbum.css'
 
 export default function PhotoAlbum() {
     return (
         <div className="PhotoAlbum">
             <BrowserRouter>
+                <HeaderComponent />
                 <Routes>
-                    <Route path="/" element={<LoginComponent />}></Route>
-                    <Route path="/login" element={<LoginComponent />}></Route>
-                    <Route path="/welcome/:username" element={<WelcomeComponent />}></Route>
-                    <Route path="*" element={<ErrorComponent />}></Route>
+                    <Route path="/" element={<LoginComponent />} />
+                    <Route path="/login" element={<LoginComponent />} />
+                    <Route path="/welcome/:username" element={<WelcomeComponent />} />
+                    <Route path="*" element={<ErrorComponent />} />
                 </Routes>
             </BrowserRouter>
         </div>
@@ -51,13 +52,13 @@ function LoginComponent() {
             {showErrorMessage && <div className="errorMessage">아이디 또는 비밀번호가 일치하지 않습니다</div>}
             <div className="LoginForm">
                 <div>
-                    <input type="text" placeholder="이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
+                    <input style={{ margin: '5px' }} type="text" placeholder="이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
                 </div>
                 <div>
-                    <input type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
+                    <input style={{ margin: '5px' }} type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
                 </div>
                 <div>
-                    <button type="button" name="login" onClick={handleSubmit}>로그인</button>
+                    <button style={{ margin: '10px', padding: '5px' }} type="button" name="login" onClick={handleSubmit}>로그인</button>
                 </div>
             </div>
         </div>
@@ -84,5 +85,27 @@ function ErrorComponent() {
                 123-456으로 문의 바랍니다
             </div>
         </div>
+    )
+}
+
+function HeaderComponent() {
+    return (
+        <header className="border-bottom border-light border-5 mb-5 p-2">
+            <div className="container">
+                <div className="row">
+                    <nav className="navbar navbar-expand-lg">
+                        <Link className="navbar-brand ms-2 fs-2 fw-bold text-black" to="http://localhost:3000">PhotoAlbum</Link>
+                        <div className="collapse navbar-collapse">
+                            <ul className="navbar-nav">
+                                <li className="nav-item fs-5"><Link className="nav-link" to="/welcome/abc">Home</Link></li>
+                            </ul>
+                        </div>
+                        <ul className="navbar-nav">
+                            <li className="nav-item fs-5"><Link className="nav-link" to="/login">Login</Link></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </header>
     )
 }
