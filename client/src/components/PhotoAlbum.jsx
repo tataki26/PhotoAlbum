@@ -11,6 +11,8 @@ export default function PhotoAlbum() {
                     <Route path="/" element={<LoginComponent />} />
                     <Route path="/login" element={<LoginComponent />} />
                     <Route path="/welcome/:username" element={<WelcomeComponent />} />
+                    <Route path="/albums" element={<ListAlbumComponent />} />
+
                     <Route path="*" element={<ErrorComponent />} />
                 </Routes>
             </BrowserRouter>
@@ -67,11 +69,19 @@ function LoginComponent() {
 
 function WelcomeComponent() {
     const {username} = useParams(); // {username} == params.username
+    
+    const navigate = useNavigate();
+
+    function handleMoveToAlbumClick() {
+        navigate("/albums");
+    }
 
     return (
-        <div className="Welcome">
+        <div className="WelcomeComponent">
             <h1>환영합니다, {username}!</h1>
-            <div>Welcome Component</div> 
+            <div>
+                <button style={{ margin: '10px', padding: '5px' }} type="button" aria-label="앨범 페이지로 이동" onClick={handleMoveToAlbumClick}>내 앨범으로 이동</button>
+            </div>
         </div>
     )
 }
@@ -88,6 +98,17 @@ function ErrorComponent() {
     )
 }
 
+function ListAlbumComponent() {
+    return (
+        <div className="ListAlbumComponent">
+            <h1>내 사진첩</h1>
+            <div>
+                Album Details
+            </div>
+        </div>
+    )
+}
+
 function HeaderComponent() {
     return (
         <header className="border-bottom border-light border-5 mb-5 p-2">
@@ -98,6 +119,7 @@ function HeaderComponent() {
                         <div className="collapse navbar-collapse">
                             <ul className="navbar-nav">
                                 <li className="nav-item fs-5"><Link className="nav-link" to="/welcome/abc">Home</Link></li>
+                                <li className="nav-item fs-5"><Link className="nav-link" to="/albums">Albums</Link></li>
                             </ul>
                         </div>
                         <ul className="navbar-nav">
