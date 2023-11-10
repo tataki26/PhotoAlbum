@@ -1,8 +1,14 @@
-input {
-    margin: 5px;
+.LoginInput {
+    margin: 2px;
+    padding: 5px;
 }
 
-button {
+.LoginButton {
+    margin: 8px;
+    padding: 5px;
+}
+
+.WelcomeButton {
     margin: 10px;
     padding: 5px;
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
-// import './PhotoAlbum.css'
+import './PhotoAlbum.css'
 
 export default function PhotoAlbum() {
     return (
@@ -54,13 +54,13 @@ function LoginComponent() {
             {showErrorMessage && <div className="errorMessage">아이디 또는 비밀번호가 일치하지 않습니다</div>}
             <div className="LoginForm">
                 <div>
-                    <input style={{ margin: '5px' }} type="text" placeholder="이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
+                    <input className="LoginInput" type="text" placeholder="이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
                 </div>
                 <div>
-                    <input style={{ margin: '5px' }} type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
+                    <input className="LoginInput" type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
                 </div>
                 <div>
-                    <button style={{ margin: '10px', padding: '5px' }} type="button" name="login" onClick={handleSubmit}>로그인</button>
+                    <button className="LoginButton" type="button" name="login" onClick={handleSubmit}>로그인</button>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@ function WelcomeComponent() {
         <div className="WelcomeComponent">
             <h1>환영합니다, {username}!</h1>
             <div>
-                <button style={{ margin: '10px', padding: '5px' }} type="button" aria-label="앨범 페이지로 이동" onClick={handleMoveToAlbumClick}>내 앨범으로 이동</button>
+                <button className="WelcomeButton" type="button" aria-label="앨범 페이지로 이동" onClick={handleMoveToAlbumClick}>내 앨범으로 이동</button>
             </div>
         </div>
     )
