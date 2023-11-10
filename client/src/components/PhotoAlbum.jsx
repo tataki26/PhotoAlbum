@@ -10,6 +10,7 @@ export default function PhotoAlbum() {
                 <Routes>
                     <Route path="/" element={<LoginComponent />} />
                     <Route path="/login" element={<LoginComponent />} />
+                    <Route path="/users" element={<UserComponent />} />
                     <Route path="/welcome/:username" element={<WelcomeComponent />} />
                     <Route path="/albums" element={<ListAlbumComponent />} />
 
@@ -49,7 +50,7 @@ function LoginComponent() {
     }
 
     return (
-        <div className="Login">
+        <div className="LoginComponent">
             <h1>로그인</h1>
             {showErrorMessage && <div className="errorMessage">아이디 또는 비밀번호가 일치하지 않습니다</div>}
             <div className="LoginForm">
@@ -61,6 +62,53 @@ function LoginComponent() {
                 </div>
                 <div>
                     <button className="LoginButton" type="button" name="login" onClick={handleSubmit}>로그인</button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+function UserComponent() {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const navigate = useNavigate();
+
+    function handleUsernameChange(e) {
+        setUsername(e.target.value);
+    }
+
+    function handleEmailChange(e) {
+        setEmail(e.target.value);
+    }
+
+    function handlePasswordChange(e) {
+        setPassword(e.target.value);
+    }
+
+    function handleSubmit() {
+        navigate(`/welcome/${username}`);
+    }
+
+    return (
+        <div className="UserComponent">
+            <h1>회원 가입</h1>
+            <div className="UserForm">
+                <div>
+                    <input className="UserInput" type="text" placeholder="이름 입력" name="email" value={username} onChange={handleUsernameChange}/>
+                </div>
+                <div>
+                    <input className="UserInput" type="text" placeholder="이메일 입력" name="password" value={email} onChange={handleEmailChange}/>
+                </div>
+                <div>
+                    <input className="UserInput" type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
+                </div>
+                <div>
+                    <input className="UserInput" type="password" placeholder="비밀번호 재입력" name="password" value={password} onChange={handlePasswordChange}/>
+                </div>
+                <div>
+                    <button className="UserButton" type="button" aria-label="회원 가입" onClick={handleSubmit}>회원 가입</button>
                 </div>
             </div>
         </div>
@@ -124,6 +172,7 @@ function HeaderComponent() {
                         </div>
                         <ul className="navbar-nav">
                             <li className="nav-item fs-5"><Link className="nav-link" to="/login">Login</Link></li>
+                            <li className="nav-item fs-5"><Link className="nav-link" to="/users">Join Us</Link></li>
                         </ul>
                     </nav>
                 </div>

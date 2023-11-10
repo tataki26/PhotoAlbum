@@ -1,9 +1,9 @@
-.LoginInput {
+.LoginInput, .UserInput {
     margin: 2px;
     padding: 5px;
 }
 
-.LoginButton {
+.LoginButton, .UserButton {
     margin: 8px;
     padding: 5px;
 }
