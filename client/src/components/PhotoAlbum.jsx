@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useParams, Link } from 'react-router-dom';
 import './PhotoAlbum.css'
 
@@ -10,6 +10,7 @@ export default function PhotoAlbum() {
                 <Routes>
                     <Route path="/" element={<LoginComponent />} />
                     <Route path="/login" element={<LoginComponent />} />
+                    <Route path="/logout" element={<LogoutComponent />} />
                     <Route path="/users" element={<UserComponent />} />
                     <Route path="/welcome/:username" element={<WelcomeComponent />} />
                     <Route path="/albums" element={<ListAlbumComponent />} />
@@ -157,6 +158,16 @@ function ListAlbumComponent() {
     )
 }
 
+function LogoutComponent() {
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        navigate("/");
+    }, []);
+
+    return null;
+}
+
 function HeaderComponent() {
     return (
         <header className="border-bottom border-light border-5 mb-5 p-2">
@@ -172,6 +183,7 @@ function HeaderComponent() {
                         </div>
                         <ul className="navbar-nav">
                             <li className="nav-item fs-5"><Link className="nav-link" to="/login">Login</Link></li>
+                            <li className="nav-item fs-5"><Link className="nav-link" to="/logout">Logout</Link></li>
                             <li className="nav-item fs-5"><Link className="nav-link" to="/users">Join Us</Link></li>
                         </ul>
                     </nav>
