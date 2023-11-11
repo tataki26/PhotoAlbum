@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from './security/AuthContext';
 
 export default function LoginComponent() {
     const [email, setEmail] = useState('');
@@ -8,6 +9,8 @@ export default function LoginComponent() {
     const [showErrorMessage, setShowErrorMessage] = useState(false);
 
     const navigate = useNavigate();
+
+    const authContext = useAuth();
 
     function handleEmailChange(e) {
         setEmail(e.target.value);
@@ -19,12 +22,14 @@ export default function LoginComponent() {
 
     function handleSubmit() {
         if (email === "abc@test.com" && password === "1234") {
+            authContext.setAuthenticated(true);
             setShowErrorMessage(false);
             const atIndex = email.indexOf("@");
             const username = email.slice(0, atIndex);
             navigate(`/welcome/${username}`);
         }
         else {
+            authContext.setAuthenticated(false);
             setShowErrorMessage(true);
         }
     }
