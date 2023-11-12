@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import RootComponent from './RootComponent';
 import LoginComponent from './LoginComponent';
 import LogoutComponent from './LogoutComponent';
 import UserComponent from './UserComponent';
@@ -16,7 +17,7 @@ export default function PhotoAlbum() {
                 <BrowserRouter>
                     <HeaderComponent />
                     <Routes>
-                        <Route path="/" element={<LoginComponent />} />
+                        <Route path="/" element={<RootComponent />} />
                         <Route path="/login" element={<LoginComponent />} />
                         <Route path="/logout" element={<LogoutComponent />} />
                         <Route path="/users" element={<UserComponent />} />
