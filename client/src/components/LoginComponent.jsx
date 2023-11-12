@@ -21,15 +21,12 @@ export default function LoginComponent() {
     }
 
     function handleSubmit() {
-        if (email === "abc@test.com" && password === "1234") {
-            authContext.setAuthenticated(true);
-            setShowErrorMessage(false);
+        if (authContext.login(email, password)) {
             const atIndex = email.indexOf("@");
             const username = email.slice(0, atIndex);
             navigate(`/welcome/${username}`);
         }
         else {
-            authContext.setAuthenticated(false);
             setShowErrorMessage(true);
         }
     }

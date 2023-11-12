@@ -8,7 +8,8 @@ export default function LogoutComponent() {
 
     useEffect(() => {
         navigate("/");
-        authContext.setAuthenticated(false);
+        authContext.logout();
+        // eslint-disable-next-line
     }, []);
 
     return null;
