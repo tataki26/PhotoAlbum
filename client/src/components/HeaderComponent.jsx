@@ -30,7 +30,7 @@ export default function HeaderComponent() {
                             </li>
                             <li className="nav-item fs-5">
                                 {isAuthenticated
-                                    && <Link className="nav-link" to="/logout">Logout</Link>}
+                                    && <Link className="nav-link" to="/logout" onClick={() => authContext.logout()}>Logout</Link>}
                             </li>
                             <li className="nav-item fs-5">
                                 {!isAuthenticated
