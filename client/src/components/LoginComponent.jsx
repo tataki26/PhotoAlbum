@@ -20,8 +20,8 @@ export default function LoginComponent() {
         setPassword(e.target.value);
     }
 
-    function handleSubmit() {
-        if (authContext.login(email, password)) {
+    async function handleSubmit() {
+        if (await authContext.login(email, password)) {
             const atIndex = email.indexOf("@");
             const username = email.slice(0, atIndex);
             navigate(`/welcome/${username}`);
