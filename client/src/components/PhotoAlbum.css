@@ -1,14 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
+
 .LoginInput, .UserInput {
-    margin: 2px;
+    width: 300px;
+    height: 45px;
+    margin: 3px;
     padding: 5px;
+    border-radius: 9px;
+    border: 1.25px solid #000;
+    background: #FFF;
 }
 
 .LoginButton, .UserButton {
-    margin: 8px;
+    color: #FFF;
+    background-color: #A44A21;
+    width: 300px;
+    height: 51px;
+    margin: 10px;
     padding: 5px;
+    border-radius: 9px;
+    border: none;
 }
 
 .WelcomeButton {
     margin: 10px;
     padding: 5px;
+}
+
+.LogoImg {
+    margin-bottom: 15px;
+}
+
+.LogoLabel {
+    color: #A44A21;
+    font-family: Agbalumo, sans-serif;
+    font-size: 40px;
+    margin-bottom: 3px;
+    padding: 10px;
+}
+
+.errorMessage {
+    margin-bottom: 10px;
 }
