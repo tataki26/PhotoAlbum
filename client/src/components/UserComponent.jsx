@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { createMemberApi } from '../apis/MemberApiService';
+import logo from '../assets/pngs/ph_diamond.png';
 
 export default function UserComponent() {
     const [username, setUsername] = useState('');
@@ -51,7 +52,10 @@ export default function UserComponent() {
 
     return (
         <div className="UserComponent">
-            <h1>회원 가입</h1>
+            <div>
+                <img src={logo} alt="logo" className="LogoImg" />
+                <label className="LogoLabel">PhotoAlbum</label>
+            </div>
             <div className="UserForm">
                 <div>
                     <input className="UserInput" type="text" placeholder="이름 입력" name="username" value={username} onChange={handleUsernameChange}/>

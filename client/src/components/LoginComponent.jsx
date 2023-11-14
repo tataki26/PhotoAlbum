@@ -41,10 +41,10 @@ export default function LoginComponent() {
             {showErrorMessage && <div className="errorMessage">아이디 또는 비밀번호가 일치하지 않습니다</div>}
             <div className="LoginForm">
                 <div>
-                    <input className="LoginInput" type="text" placeholder=" 이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
+                    <input className="LoginInput" type="text" placeholder="이메일 입력" name="email" value={email} onChange={handleEmailChange}/>
                 </div>
                 <div>
-                    <input className="LoginInput" type="password" placeholder=" 비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
+                    <input className="LoginInput" type="password" placeholder="비밀번호 입력" name="password" value={password} onChange={handlePasswordChange}/>
                 </div>
                 <div>
                     <button className="LoginButton" type="button" name="login" onClick={handleSubmit}>로그인</button>
