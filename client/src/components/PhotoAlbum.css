@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Agbalumo&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sunflower:wght@500&display=swap');
 
 .LoginInput, .UserInput {
     width: 300px;
@@ -11,7 +12,7 @@
     background: #FFF;
 }
 
-.LoginButton, .UserButton {
+.LoginButton, .UserButton, .WelcomeButton {
     color: #FFF;
     background-color: #A44A21;
     width: 300px;
@@ -32,6 +33,12 @@
     font-size: 40px;
     margin-bottom: 3px;
     padding: 10px;
+}
+
+.welcomeMessage {
+    font-family: Sunflower, sans-serif;
+    font-size: 40px;
+    margin: 5px;
 }
 
 .errorMessage {
