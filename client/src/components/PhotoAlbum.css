@@ -41,3 +41,7 @@
 .errorMessage {
     margin-bottom: 10px;
 }
+
+#customNavbarLink {
+    font-family: Agbalumo, sans-serif;
+}
