@@ -48,3 +48,36 @@
 #customNavbarLink {
     font-family: Agbalumo, sans-serif;
 }
+
+.AlbumLabel {
+    color: #A44A21;
+    font-size: 30px;
+    font-weight: bold;
+    margin-left: 40px;
+    margin-bottom: 5px;
+}
+
+.AlbumSortLabel {
+    color: #A44A21;
+    font-family: Noto Sans KR;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.AlbumSortButton {
+    border: none;
+    background-color: transparent;
+}
+
+.AlbumSearchInput {
+    margin-left: 20px;
+    padding-left: 15px;
+    width: 425.799px;
+    height: 33.281px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    border: 1px solid #000;
+    background: #FFF;
+}
