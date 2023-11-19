@@ -5,8 +5,20 @@ import User01c from '../assets/pngs/User01c.png';
 import User02c from '../assets/pngs/User02c.png';
 import User03c from '../assets/pngs/User03c.png';
 import User04c from '../assets/pngs/User04c.png';
+import { retrieveAlbumListApi } from '../apis/AlbumApiService';
 
 export default function ListAlbumComponent() {
+    const queryParams = {
+        sort: "byName",
+        keyword: "앨범"
+    };
+
+    retrieveAlbumListApi(queryParams)
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => console.log(error));
+
     const albumList = [
         {id: 1, name: "2023_01", count: 4, photo: User01c},
         {id: 2, name: "2023_02", count: 10, photo: User02c},
@@ -22,7 +34,7 @@ export default function ListAlbumComponent() {
 
     return (
         <div>
-            <header className="border-bottom border-light border-5 mb-5 p-2" style={{"margin-top": "-70px"}}>
+            <header className="border-bottom border-light border-5 mb-5 p-2" style={{marginTop: "-70px"}}>
                 <div className="container">
                     <div className="row">
                         <nav className="navbar navbar-expand-lg">
