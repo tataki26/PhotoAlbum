@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import vector5 from '../assets/svgs/vector5.svg';
 import downArrow from '../assets/svgs/down-arrow.svg';
@@ -13,24 +14,26 @@ export default function ListAlbumComponent() {
         keyword: "앨범"
     };
 
-    retrieveAlbumListApi(queryParams)
+    const [albumList, setAlbumList] = useState([]);
+
+    useEffect(() => refreshAlbumList(), []);
+
+    function refreshAlbumList() {
+        retrieveAlbumListApi(queryParams)
         .then(response => {
             console.log(response.data);
+            setAlbumList(response.data);
         })
         .catch(error => console.log(error));
-
-    const albumList = [
-        {id: 1, name: "2023_01", count: 4, photo: User01c},
-        {id: 2, name: "2023_02", count: 10, photo: User02c},
-        {id: 3, name: "2023_03", count: 25, photo: User03c},
-        {id: 4, name: "2023_04", count: 1, photo: User04c}
-    ]
+    }
     
     const navigate = useNavigate();
                
     function handleClick() {
         navigate("/");
     }
+
+    const imageArray = [User01c, User02c, User03c, User04c, User01c];
 
     return (
         <div>
@@ -76,17 +79,21 @@ export default function ListAlbumComponent() {
                             </tr>
                         </thead>
                         <tbody>
-                        {
-                            albumList.map(
-                                albumList => (
-                                    <tr key={albumList.id}>
-                                        <td>{albumList.name}</td>
-                                        <td>{albumList.count}</td>
-                                        <td onClick={handleClick} style={{ cursor: 'pointer' }}><img src={albumList.photo} alt="user photo" /></td>
-                                    </tr>
-                                )
-                            )
-                        }
+                            {albumList.map((album, index) => (
+                            <tr key={album.albumId}>
+                                <td>{album.albumName}</td>
+                                <td>{album.count}</td>
+                                <td onClick={handleClick} style={{ cursor: 'pointer' }}>
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col">
+                                            <img src={imageArray[index++]} alt={`user photo ${index + 1}`} className="img-thumbnail" />
+                                        </div>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
