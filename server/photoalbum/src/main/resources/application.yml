@@ -1,15 +1,24 @@
+# H2 데이터베이스 설정
+# spring:
+#   datasource:
+#     url: jdbc:h2:tcp://localhost/~/photoalbum
+#     username: sa
+#     password:
+#     driver-class-name: org.h2.Driver
+
+# MySQL 데이터베이스 설정
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/photoalbum
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/photo_album_database
+    username: photo-album-user
+    password: userpassword
 
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
         # show_sql: true
         format_sql: true
 
