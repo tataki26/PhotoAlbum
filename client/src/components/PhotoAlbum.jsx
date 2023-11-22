@@ -7,6 +7,7 @@ import UserComponent from './UserComponent';
 import WelcomeComponent from './WelcomeComponent';
 import HeaderComponent from './HeaderComponent';
 import ListAlbumComponent from './ListAlbumComponent';
+import AlbumComponent from './AlbumComponent';
 import ErrorComponent from './ErrorComponent';
 import AuthProvider from './security/AuthContext';
 import './PhotoAlbum.css'
@@ -43,6 +44,11 @@ export default function PhotoAlbum() {
                         <Route path="/albums" element={
                             <AuthenticatedRoute>
                                 <ListAlbumComponent />
+                            </AuthenticatedRoute>
+                        } />
+                        <Route path="/albums/:id" element={
+                            <AuthenticatedRoute>
+                                <AlbumComponent />
                             </AuthenticatedRoute>
                         } />
                         <Route path="*" element={<ErrorComponent />} />

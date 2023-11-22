@@ -16,6 +16,8 @@ export default function ListAlbumComponent() {
 
     const [albumList, setAlbumList] = useState([]);
 
+    const navigate = useNavigate();
+
     useEffect(() => refreshAlbumList(), []);
 
     function refreshAlbumList() {
@@ -27,10 +29,8 @@ export default function ListAlbumComponent() {
         .catch(error => console.log(error));
     }
     
-    const navigate = useNavigate();
-               
-    function handleClick() {
-        navigate("/");
+    function handleClick(id) {
+        navigate(`/albums/${id}`);
     }
 
     const imageArray = [User01c, User02c, User03c, User04c, User01c];
@@ -83,7 +83,7 @@ export default function ListAlbumComponent() {
                             <tr key={album.albumId}>
                                 <td>{album.albumName}</td>
                                 <td>{album.count}</td>
-                                <td onClick={handleClick} style={{ cursor: 'pointer' }}>
+                                <td onClick={() => handleClick(album.albumId)} style={{ cursor: 'pointer' }}>
                                 <div className="container">
                                     <div className="row">
                                         <div className="col">
