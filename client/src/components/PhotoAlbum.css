@@ -66,7 +66,8 @@
     line-height: normal;
 }
 
-.AlbumSortButton {
+.AlbumSortButton, .MovePhotoButton, .DeletePhotoButton, .DownloadPhotoButton {
+    margin-right: 10px;
     border: none;
     background-color: transparent;
 }
@@ -80,4 +81,9 @@
     border-radius: 9px;
     border: 1px solid #000;
     background: #FFF;
+}
+
+.AlbumDetailHeader {
+    float: right;
+    margin-right: 160px;
 }

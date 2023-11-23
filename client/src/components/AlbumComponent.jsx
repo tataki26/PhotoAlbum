@@ -4,6 +4,10 @@ import User01c from '../assets/pngs/User01c.png';
 import User02c from '../assets/pngs/User02c.png';
 import User03c from '../assets/pngs/User03c.png';
 import User04c from '../assets/pngs/User04c.png';
+import line from '../assets/svgs/horizontal-line.svg';
+import driveFileMove from '../assets/svgs/drive-file-move.svg';
+import trashCan from '../assets/svgs/trash-can.svg';
+import download from '../assets/svgs/download.svg';
 import { retrieveAlbumApi } from '../apis/AlbumApiService';
 
 export default function AlbumComponent() {
@@ -28,22 +32,34 @@ export default function AlbumComponent() {
 
     return (
         <div>
+            <div className="AlbumDetailHeader">
+                <button className="MovePhotoButton">
+                    <img src={driveFileMove} alt={"move file"} />
+                </button>
+                <button className="DeletePhotoButton">
+                    <img src={trashCan} alt={"delete file"} />
+                </button>
+                <button className="DownloadPhotoButton">
+                    <img src={download} alt={"download file"} />
+                </button>
+            </div>
+            <div>
+                <img src={line} alt={"line"} className="vector" />
+            </div>
             <table className="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Photos</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr key={id}>
-                        <td>{id}</td>
                         <td>
                             <div className="container">
                                 <div className="row">
                                     {imageArray.map((image, index) => (
                                         <div className="col" key={index}>
-                                            <img src={image} alt={`user photo ${index + 1}`} className="img-thumbnail" />
+                                            <img src={image} alt={`user ${index + 1}`} className="img-thumbnail" />
                                         </div>
                                     ))}
                                 </div>

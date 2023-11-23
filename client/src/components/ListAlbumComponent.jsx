@@ -87,7 +87,7 @@ export default function ListAlbumComponent() {
                                 <div className="container">
                                     <div className="row">
                                         <div className="col">
-                                            <img src={imageArray[index++]} alt={`user photo ${index + 1}`} className="img-thumbnail" />
+                                            <img src={imageArray[index++]} alt={`user ${index + 1}`} className="img-thumbnail" />
                                         </div>
                                     </div>
                                 </div>
