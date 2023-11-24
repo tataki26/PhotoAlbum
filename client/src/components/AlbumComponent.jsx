@@ -9,6 +9,7 @@ import driveFileMove from '../assets/svgs/drive-file-move.svg';
 import trashCan from '../assets/svgs/trash-can.svg';
 import download from '../assets/svgs/download.svg';
 import { retrieveAlbumApi } from '../apis/AlbumApiService';
+import { movePhotoApi } from '../apis/PhotoApiService';
 
 export default function AlbumComponent() {
     const {id} = useParams();
@@ -28,13 +29,27 @@ export default function AlbumComponent() {
         [id]
     );
 
+    const photo = {
+        fromAlbumId: 1,
+        toAlbumId: 5,
+        photoIds: [1,2,3],
+    }
+
+    function movePhoto() {
+        movePhotoApi(id, photo)
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => console.log(error));
+    }
+
     const imageArray = [User01c, User02c, User03c, User04c, User01c];
 
     return (
         <div>
             <div className="AlbumDetailHeader">
                 <button className="MovePhotoButton">
-                    <img src={driveFileMove} alt={"move file"} />
+                    <img src={driveFileMove} alt={"move file"} onClick={()=>movePhoto(id, photo)}/>
                 </button>
                 <button className="DeletePhotoButton">
                     <img src={trashCan} alt={"delete file"} />
