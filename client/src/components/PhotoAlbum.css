@@ -87,3 +87,32 @@
     float: right;
     margin-right: 160px;
 }
+
+.AlbumNameLabel {
+    font-size: 40px;
+    margin-left: 200px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.AddPhotoButton {
+    width: 241px;
+    height: 56px;
+    border: none;
+    float: left;
+    color: #FFF;
+    background: #E6864E;
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-left: 200px;
+    margin-bottom: 10px;
+}
+
+.AlbumDetailLabel {
+    margin-top: 15px;
+    margin-right: 1050px;
+    font-size: 20px;
+}

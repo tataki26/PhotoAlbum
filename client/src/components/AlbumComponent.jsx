@@ -15,14 +15,26 @@ export default function AlbumComponent() {
     const {id} = useParams();
 
     const [name, setName] = useState('');
+    const [date, setDate] = useState('');
+    const [count, setCount] = useState(0);
 
     function retrieveAlbum() {
         retrieveAlbumApi(id)
         .then(response => {
             setName(response.data.albumName);
+            setDate(response.data.createAt);
+            setCount(response.data.count);
         })
         .catch(error => console.log(error));
     }
+
+    const dateObject = new Date(date);
+
+    const year = dateObject.getFullYear();
+    const month = dateObject.getMonth() + 1;
+    const day = dateObject.getDate();
+
+    const fullDate = year + "-" + month + "-" + day;
 
     useEffect(
         () => retrieveAlbum(),
@@ -47,6 +59,13 @@ export default function AlbumComponent() {
 
     return (
         <div>
+            <div style={{"display": "flex", "flexDirection": "column"}}>
+                <label className="AlbumNameLabel">{name}</label>
+                <div>
+                    <button className="AddPhotoButton">사진 추가</button>
+                    <label className="AlbumDetailLabel">{fullDate} | {count}장</label>
+                </div>
+            </div>
             <div className="AlbumDetailHeader">
                 <button className="MovePhotoButton">
                     <img src={driveFileMove} alt={"move file"} onClick={()=>movePhoto(id, photo)}/>
@@ -62,11 +81,6 @@ export default function AlbumComponent() {
                 <img src={line} alt={"line"} className="vector" />
             </div>
             <table className="table">
-                <thead>
-                    <tr>
-                        <th>Photos</th>
-                    </tr>
-                </thead>
                 <tbody>
                     <tr key={id}>
                         <td>
