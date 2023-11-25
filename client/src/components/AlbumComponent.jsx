@@ -10,6 +10,7 @@ import trashCan from '../assets/svgs/trash-can.svg';
 import download from '../assets/svgs/download.svg';
 import { retrieveAlbumApi } from '../apis/AlbumApiService';
 import { movePhotoApi } from '../apis/PhotoApiService';
+import { deletePhotoApi } from '../apis/PhotoApiService';
 
 export default function AlbumComponent() {
     const {id} = useParams();
@@ -41,16 +42,26 @@ export default function AlbumComponent() {
         [id]
     );
 
-    const photo = {
+    const movePhotoDto = {
         fromAlbumId: 1,
         toAlbumId: 5,
         photoIds: [1,2,3],
     }
 
     function movePhoto() {
-        movePhotoApi(id, photo)
+        movePhotoApi(id, movePhotoDto)
         .then(response => {
             console.log(response.data);
+        })
+        .catch(error => console.log(error));
+    }
+
+    const photoIds = [202,203,204];
+
+    function deletePhoto() {
+        deletePhotoApi(id, photoIds)
+        .then(response => {
+            console.log("success to delete photos");
         })
         .catch(error => console.log(error));
     }
@@ -68,10 +79,10 @@ export default function AlbumComponent() {
             </div>
             <div className="AlbumDetailHeader">
                 <button className="MovePhotoButton">
-                    <img src={driveFileMove} alt={"move file"} onClick={()=>movePhoto(id, photo)}/>
+                    <img src={driveFileMove} alt={"move file"} onClick={movePhoto} />
                 </button>
                 <button className="DeletePhotoButton">
-                    <img src={trashCan} alt={"delete file"} />
+                    <img src={trashCan} alt={"delete file"} onClick={deletePhoto} />
                 </button>
                 <button className="DownloadPhotoButton">
                     <img src={download} alt={"download file"} />
