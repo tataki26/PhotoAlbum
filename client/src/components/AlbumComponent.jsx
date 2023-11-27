@@ -44,25 +44,23 @@ export default function AlbumComponent() {
     const [selectedFiles, setSelectedFiles] = useState(null);
 
     function handleFileChange(event) {
-        const files = event.target.files;
-        
-        setSelectedFiles(files);
-
-        if (files) {
-            addPhoto();
-        }
+        setSelectedFiles(event.target.files);
     };
 
-    function addPhoto() {
+    const handleUploadButtonClick = () => {
         if (!selectedFiles) {
-            console.error('no selected file');
+            console.log('no selected file');
             return;
         }
 
+        addPhoto();
+    };
+
+    function addPhoto() {
         const formData = new FormData();
 
         Array.from(selectedFiles).forEach((file) => {
-        formData.append('photos', file);
+            formData.append('photos', file);
         });
 
         addPhotoApi(id, formData)
@@ -104,8 +102,9 @@ export default function AlbumComponent() {
                 <label className="AlbumNameLabel">{name}</label>
                 <div>
                     <div className="FileUploadContainer">
-                        <input type="file" onChange={handleFileChange} className="FileInput" />
-                        <label className="AddPhotoButton" onClick={handleFileChange}>사진 추가</label>
+                        <label className="FileLabel" htmlFor="chooseFile">사진 불러오기</label>
+                        <input type="file" id="chooseFile" className="FileInput" onChange={handleFileChange} multiple />
+                        <button className="AddPhotoButton" onClick={handleUploadButtonClick}>사진 추가</button>
                         <label className="AlbumDetailLabel">{fullDate} | {count}장</label>
                     </div>   
                 </div>
