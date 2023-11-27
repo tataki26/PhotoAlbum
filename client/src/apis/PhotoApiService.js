@@ -1,5 +1,8 @@
 import { apiClient } from "./ApiClient";
 
+export const addPhotoApi
+    = (id, formData) => apiClient.post(`/albums/${id}/photos`, formData);
+
 export const movePhotoApi
     = (id, photo) => apiClient.put(`/albums/${id}/photos/move`, photo);
 

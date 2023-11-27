@@ -9,8 +9,7 @@ import driveFileMove from '../assets/svgs/drive-file-move.svg';
 import trashCan from '../assets/svgs/trash-can.svg';
 import download from '../assets/svgs/download.svg';
 import { retrieveAlbumApi } from '../apis/AlbumApiService';
-import { movePhotoApi } from '../apis/PhotoApiService';
-import { deletePhotoApi } from '../apis/PhotoApiService';
+import { addPhotoApi, movePhotoApi, deletePhotoApi } from '../apis/PhotoApiService';
 
 export default function AlbumComponent() {
     const {id} = useParams();
@@ -41,6 +40,37 @@ export default function AlbumComponent() {
         () => retrieveAlbum(),
         [id]
     );
+
+    const [selectedFiles, setSelectedFiles] = useState(null);
+
+    function handleFileChange(event) {
+        const files = event.target.files;
+        
+        setSelectedFiles(files);
+
+        if (files) {
+            addPhoto();
+        }
+    };
+
+    function addPhoto() {
+        if (!selectedFiles) {
+            console.error('no selected file');
+            return;
+        }
+
+        const formData = new FormData();
+
+        Array.from(selectedFiles).forEach((file) => {
+        formData.append('photos', file);
+        });
+
+        addPhotoApi(id, formData)
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => console.log(error));
+    };
 
     const movePhotoDto = {
         fromAlbumId: 1,
@@ -73,8 +103,11 @@ export default function AlbumComponent() {
             <div style={{"display": "flex", "flexDirection": "column"}}>
                 <label className="AlbumNameLabel">{name}</label>
                 <div>
-                    <button className="AddPhotoButton">사진 추가</button>
-                    <label className="AlbumDetailLabel">{fullDate} | {count}장</label>
+                    <div className="FileUploadContainer">
+                        <input type="file" onChange={handleFileChange} className="FileInput" />
+                        <label className="AddPhotoButton" onClick={handleFileChange}>사진 추가</label>
+                        <label className="AlbumDetailLabel">{fullDate} | {count}장</label>
+                    </div>   
                 </div>
             </div>
             <div className="AlbumDetailHeader">
