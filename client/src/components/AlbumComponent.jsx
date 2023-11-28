@@ -9,7 +9,7 @@ import driveFileMove from '../assets/svgs/drive-file-move.svg';
 import trashCan from '../assets/svgs/trash-can.svg';
 import download from '../assets/svgs/download.svg';
 import { retrieveAlbumApi } from '../apis/AlbumApiService';
-import { addPhotoApi, movePhotoApi, deletePhotoApi } from '../apis/PhotoApiService';
+import { addPhotoApi, movePhotoApi, deletePhotoApi, downloadPhotoApi } from '../apis/PhotoApiService';
 
 export default function AlbumComponent() {
     const {id} = useParams();
@@ -84,12 +84,24 @@ export default function AlbumComponent() {
         .catch(error => console.log(error));
     }
 
-    const photoIds = [202,203,204];
+    const photoIds = [252,253];
 
     function deletePhoto() {
         deletePhotoApi(id, photoIds)
         .then(response => {
             console.log("success to delete photos");
+        })
+        .catch(error => console.log(error));
+    }
+
+    const queryParams = {
+        photoIds: photoIds.join(','),
+    }
+
+    function downloadPhoto() {
+        downloadPhotoApi(id, queryParams)
+        .then(response => {
+            console.log("success to download photos");
         })
         .catch(error => console.log(error));
     }
@@ -117,7 +129,7 @@ export default function AlbumComponent() {
                     <img src={trashCan} alt={"delete file"} onClick={deletePhoto} />
                 </button>
                 <button className="DownloadPhotoButton">
-                    <img src={download} alt={"download file"} />
+                    <img src={download} alt={"download file"} onClick={downloadPhoto} />
                 </button>
             </div>
             <div>

@@ -10,3 +10,8 @@ export const deletePhotoApi
     = (id, photoIds) => apiClient.delete(`/albums/${id}/photos`, {
         data: {photoIds}
     });
+
+export const downloadPhotoApi
+    = (id, queryParams) => apiClient.get(`/albums/${id}/photos/download`, {
+        params: queryParams,
+    });
