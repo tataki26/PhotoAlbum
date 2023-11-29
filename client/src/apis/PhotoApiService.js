@@ -12,6 +12,11 @@ export const deletePhotoApi
     });
 
 export const downloadPhotoApi
-    = (id, queryParams) => apiClient.get(`/albums/${id}/photos/download`, {
-        params: queryParams,
-    });
+    = async (id, queryParams) => {
+        const response = await apiClient.get(`/albums/${id}/photos/download`, {
+            params: queryParams,
+            responseType: 'blob',
+        });
+        return response;
+    };
+    

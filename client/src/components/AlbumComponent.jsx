@@ -98,12 +98,21 @@ export default function AlbumComponent() {
         photoIds: photoIds.join(','),
     }
 
-    function downloadPhoto() {
-        downloadPhotoApi(id, queryParams)
-        .then(response => {
-            console.log("success to download photos");
-        })
-        .catch(error => console.log(error));
+    async function downloadPhoto() {
+        try {
+            const response = await downloadPhotoApi(id, queryParams);
+            console.log("success to download photos", response);
+            
+            const blob = new Blob([response.data]);
+
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'photos.zip';
+            
+            link.click();
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     const imageArray = [User01c, User02c, User03c, User04c, User01c];
