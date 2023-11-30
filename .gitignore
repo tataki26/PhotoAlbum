@@ -64,3 +64,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ignore S3 configuration file
+application-s3.yml
