@@ -1,5 +1,7 @@
 package com.tataki26.photoalbum.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.tataki26.photoalbum.Constants;
 import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.domain.Photo;
@@ -11,6 +13,7 @@ import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -20,11 +23,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,6 +37,11 @@ import static com.tataki26.photoalbum.Constants.PATH_PREFIX;
 public class PhotoService {
     private final AlbumRepository albumRepository;
     private final PhotoRepository photoRepository;
+
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     private final String ORIGINAL_PATH = PATH_PREFIX + "/photos/original/";
     private final String THUMB_PATH = PATH_PREFIX + "/photos/thumb/";
@@ -66,7 +72,7 @@ public class PhotoService {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 앨범이 없습니다", albumId)));
     }
 
-    public PhotoDto savePhoto(Long albumId, MultipartFile file) {
+    public PhotoDto savePhotoV1(Long albumId, MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(originalFileName);
         int fileSize = (int)file.getSize();
@@ -170,6 +176,27 @@ public class PhotoService {
             return false;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public List<String> savePhotoV2(MultipartFile[] files) {
+        List<String> fileUrls = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                String fileName = file.getOriginalFilename();
+
+                String fileUrl = "https://" + bucket + "/test" + fileName;
+                fileUrls.add(fileUrl);
+
+                ObjectMetadata metaData = new ObjectMetadata();
+                metaData.setContentType(file.getContentType());
+                metaData.setContentLength(file.getSize());
+
+                amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metaData);
+            }
+            return fileUrls;
+        } catch (IOException e) {
+            throw new RuntimeException("파일을 저장할 수 없습니다. 에러: " + e.getMessage());
         }
     }
 

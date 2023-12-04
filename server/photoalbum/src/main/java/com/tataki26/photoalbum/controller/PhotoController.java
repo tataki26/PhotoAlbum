@@ -1,6 +1,5 @@
 package com.tataki26.photoalbum.controller;
 
-import com.tataki26.photoalbum.dto.AlbumDto;
 import com.tataki26.photoalbum.dto.PhotoDto;
 import com.tataki26.photoalbum.service.PhotoService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,16 +26,22 @@ public class PhotoController {
         return new ResponseEntity<>(photoService.retrievePhoto(albumId, photoId), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<List<PhotoDto>> uploadPhotos(@PathVariable("albumId") final Long albumId,
-                                                       @RequestParam("photos")MultipartFile[] files) {
+    @PostMapping("/v1")
+    public ResponseEntity<List<PhotoDto>> uploadPhotosV1(@PathVariable("albumId") final Long albumId,
+                                                         @RequestParam("photos")MultipartFile[] files) {
         List<PhotoDto> photoDtoList = new ArrayList<>();
         for (MultipartFile file : files) {
-            PhotoDto photoDto = photoService.savePhoto(albumId, file);
+            PhotoDto photoDto = photoService.savePhotoV1(albumId, file);
             photoDtoList.add(photoDto);
         }
 
         return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
+    }
+
+    @PostMapping("/v2")
+    public ResponseEntity<List<String>> uploadPhotosV2(@RequestParam("photos") MultipartFile[] files) {
+        List<String> fileUrls = photoService.savePhotoV2(files);
+        return new ResponseEntity<>(fileUrls, HttpStatus.OK);
     }
 
     @GetMapping("download")
