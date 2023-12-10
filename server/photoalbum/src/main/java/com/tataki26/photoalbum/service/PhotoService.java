@@ -181,58 +181,69 @@ public class PhotoService {
         }
     }
 
-    public List<String> savePhotoV2(MultipartFile[] files) {
-        List<String> fileUrls = new ArrayList<>();
-        List<String> thumbFileUrls = new ArrayList<>();
+    public PhotoDto savePhotoV2(Long albumId, MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(fileName);
+
+        checkValidImageFile(file, ext);
+
+        // set photo name after check if it already exists
+        String checkedName = checkPhotoName(fileName, albumId);
+
+        // save photo file into s3
+        String originalUrl = saveOriginalPhotoFile(checkedName, file);
+        String thumbUrl = saveThumbPhotoFile(checkedName, file);
+
+        int fileSize = (int)file.getSize();
+
+        // factory method
+        Photo photo = Photo.createPhoto(checkedName, thumbUrl, originalUrl, fileSize, getAlbumById(albumId));
+        Photo savedPhoto = photoRepository.save(photo);
+
+        return PhotoMapper.toDto(savedPhoto);
+    }
+
+    private String saveOriginalPhotoFile(String fileName, MultipartFile file) {
+        String filePath = "photo/" + fileName;
+        String fileUrl = "https://" + bucket + "/" + filePath;
+
         try {
-            for (MultipartFile file : files) {
-                fileUrls = saveOriginalPhotoFile(file, fileUrls);
-                thumbFileUrls = saveThumbPhotoFile(file, thumbFileUrls);
-            }
-            return fileUrls;
+            ObjectMetadata metaData = new ObjectMetadata();
+            metaData.setContentType(file.getContentType());
+            metaData.setContentLength(file.getSize());
+
+            amazonS3Client.putObject(bucket, filePath, file.getInputStream(), metaData);
+        } catch(IOException e) {
+            throw new RuntimeException("파일을 S3에 저장할 수 없습니다. 에러: " + e.getMessage());
+        }
+
+        return fileUrl;
+    }
+
+    private String saveThumbPhotoFile(String fileName, MultipartFile file) {
+        String filePath = "thumb/" + fileName;
+        String fileUrl = "https://" + bucket + "/" + filePath;
+        String ext = StringUtils.getFilenameExtension(fileName);
+
+        try {
+            // resize thumb photo
+            BufferedImage thumbImg = Scalr.resize(ImageIO.read(file.getInputStream()), Constants.THUMB_SIZE, Constants.THUMB_SIZE);
+
+            // Convert BufferedImage to InputStream
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(thumbImg, ext, os);
+            InputStream is = new ByteArrayInputStream(os.toByteArray());
+
+            ObjectMetadata metaData = new ObjectMetadata();
+            metaData.setContentType(file.getContentType());
+            metaData.setContentLength(os.size());
+
+            amazonS3Client.putObject(bucket, filePath, is, metaData);
         } catch (IOException e) {
             throw new RuntimeException("파일을 S3에 저장할 수 없습니다. 에러: " + e.getMessage());
         }
-    }
 
-    private List<String> saveOriginalPhotoFile(MultipartFile file, List<String> fileUrls) throws IOException {
-        String fileName = file.getOriginalFilename();
-        String filePath = "photo/" + fileName;
-
-        String fileUrl = "https://" + bucket + "/" + filePath;
-        fileUrls.add(fileUrl);
-
-        ObjectMetadata metaData = new ObjectMetadata();
-        metaData.setContentType(file.getContentType());
-        metaData.setContentLength(file.getSize());
-
-        amazonS3Client.putObject(bucket, filePath, file.getInputStream(), metaData);
-
-        return fileUrls;
-    }
-
-    private List<String> saveThumbPhotoFile(MultipartFile file, List<String> thumbFileUrls) throws IOException {
-        String fileName = file.getOriginalFilename();
-        String filePath = "thumb/" + fileName;
-
-        String fileUrl = "https://" + bucket + "/" + filePath;
-        thumbFileUrls.add(fileUrl);
-
-        // resize thumb photo
-        BufferedImage thumbImg = Scalr.resize(ImageIO.read(file.getInputStream()), Constants.THUMB_SIZE, Constants.THUMB_SIZE);
-
-        // Convert BufferedImage to InputStream
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(thumbImg, "jpg", os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
-
-        ObjectMetadata metaData = new ObjectMetadata();
-        metaData.setContentType(file.getContentType());
-        metaData.setContentLength(os.size());
-
-        amazonS3Client.putObject(bucket, filePath, is, metaData);
-
-        return thumbFileUrls;
+        return fileUrl;
     }
 
     public File retrievePhotoFile(Long id) {

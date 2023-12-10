@@ -30,6 +30,7 @@ public class PhotoController {
     public ResponseEntity<List<PhotoDto>> uploadPhotosV1(@PathVariable("albumId") final Long albumId,
                                                          @RequestParam("photos")MultipartFile[] files) {
         List<PhotoDto> photoDtoList = new ArrayList<>();
+
         for (MultipartFile file : files) {
             PhotoDto photoDto = photoService.savePhotoV1(albumId, file);
             photoDtoList.add(photoDto);
@@ -39,9 +40,16 @@ public class PhotoController {
     }
 
     @PostMapping("/v2")
-    public ResponseEntity<List<String>> uploadPhotosV2(@RequestParam("photos") MultipartFile[] files) {
-        List<String> fileUrls = photoService.savePhotoV2(files);
-        return new ResponseEntity<>(fileUrls, HttpStatus.OK);
+    public ResponseEntity<List<PhotoDto>> uploadPhotosV2(@PathVariable("albumId") final Long albumId,
+                                                         @RequestParam("photos") MultipartFile[] files) {
+        List<PhotoDto> photoDtoList = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            PhotoDto photoDto = photoService.savePhotoV2(albumId, file);
+            photoDtoList.add(photoDto);
+        }
+
+        return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
     }
 
     @GetMapping("download")
