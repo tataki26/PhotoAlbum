@@ -73,7 +73,7 @@ export default function AlbumComponent() {
     const movePhotoDto = {
         fromAlbumId: 1,
         toAlbumId: 5,
-        photoIds: [1,2,3],
+        photoIds: [352,353],
     }
 
     function movePhoto() {

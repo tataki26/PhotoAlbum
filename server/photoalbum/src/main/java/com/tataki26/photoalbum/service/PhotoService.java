@@ -317,7 +317,7 @@ public class PhotoService {
     }
 
     @Transactional
-    public List<PhotoDto> movePhotosBetweenAlbums(PhotoDto photoDto) {
+    public List<PhotoDto> movePhotosBetweenAlbumsV1(PhotoDto photoDto) {
         try {
             List<Long> photoIds = photoDto.getPhotoIds();
             Long fromAlbumId = photoDto.getFromAlbumId();
@@ -325,6 +325,23 @@ public class PhotoService {
             Album toAlbum = getAlbumById(photoDto.getToAlbumId());
 
             movePhotoFiles(photoIds, fromAlbumId, toAlbum);
+
+            updateToAlbumPhotos(photoIds, fromAlbum, toAlbum);
+            deleteMovedPhotos(photoIds, fromAlbumId);
+
+            return PhotoMapper.toDtoList(fromAlbum.getPhotos());
+        } catch (Exception e) {
+            throw new RuntimeException("사진 이동에 실패했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    public List<PhotoDto> movePhotosBetweenAlbumsV2(PhotoDto photoDto) {
+        try {
+            List<Long> photoIds = photoDto.getPhotoIds();
+            Long fromAlbumId = photoDto.getFromAlbumId();
+            Album fromAlbum = getAlbumById(fromAlbumId);
+            Album toAlbum = getAlbumById(photoDto.getToAlbumId());
 
             updateToAlbumPhotos(photoIds, fromAlbum, toAlbum);
             deleteMovedPhotos(photoIds, fromAlbumId);

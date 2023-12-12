@@ -4,7 +4,7 @@ export const addPhotoApi
     = (id, formData) => apiClient.post(`/albums/${id}/photos/v2`, formData);
 
 export const movePhotoApi
-    = (id, photo) => apiClient.put(`/albums/${id}/photos/move`, photo);
+    = (id, photo) => apiClient.put(`/albums/${id}/photos/move/v2`, photo);
 
 export const deletePhotoApi
     = (id, photoIds) => apiClient.delete(`/albums/${id}/photos`, {

@@ -79,9 +79,14 @@ public class PhotoController {
         return new ResponseEntity<>(photoService.retrievePhotoList(id, sort, keyword), HttpStatus.OK);
     }
 
-    @PutMapping("move")
-    public ResponseEntity<List<PhotoDto>> movePhotos(@RequestBody final PhotoDto photoDto) {
-        return new ResponseEntity<>(photoService.movePhotosBetweenAlbums(photoDto), HttpStatus.OK);
+    @PutMapping("move/v1")
+    public ResponseEntity<List<PhotoDto>> movePhotosV1(@RequestBody final PhotoDto photoDto) {
+        return new ResponseEntity<>(photoService.movePhotosBetweenAlbumsV1(photoDto), HttpStatus.OK);
+    }
+
+    @PutMapping("move/v2")
+    public ResponseEntity<List<PhotoDto>> movePhotosV2(@RequestBody final PhotoDto photoDto) {
+        return new ResponseEntity<>(photoService.movePhotosBetweenAlbumsV2(photoDto), HttpStatus.OK);
     }
 
     @DeleteMapping
