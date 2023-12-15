@@ -89,11 +89,17 @@ public class PhotoController {
         return new ResponseEntity<>(photoService.movePhotosBetweenAlbumsV2(photoDto), HttpStatus.OK);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deletePhoto(@PathVariable("albumId") final Long albumId,
+    @DeleteMapping("/v1")
+    public ResponseEntity<Void> deletePhotoV1(@PathVariable("albumId") final Long albumId,
                                             @RequestBody final PhotoDto photoDto) {
-        photoService.removePhotos(albumId, photoDto.getPhotoIds());
+        photoService.removePhotosV1(albumId, photoDto.getPhotoIds());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @DeleteMapping("/v2")
+    public ResponseEntity<Void> deletePhotoV2(@PathVariable("albumId") final Long albumId,
+                                              @RequestBody final PhotoDto photoDto) {
+        photoService.removePhotosV2(albumId, photoDto.getPhotoIds());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

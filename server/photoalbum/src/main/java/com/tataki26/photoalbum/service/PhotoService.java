@@ -391,7 +391,7 @@ public class PhotoService {
                 .executeUpdate();
     }
 
-    public void removePhotos(Long albumId, List<Long> photoIds) {
+    public void removePhotosV1(Long albumId, List<Long> photoIds) {
         for (Long photoId : photoIds) {
             Photo photo = photoRepository.findById(photoId)
                     .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId)));
@@ -422,5 +422,18 @@ public class PhotoService {
         }
 
         return false;
+    }
+
+    public void removePhotosV2(Long albumId, List<Long> photoIds) {
+        for (Long photoId : photoIds) {
+            Photo photo = photoRepository.findById(photoId)
+                    .orElseThrow(() -> new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", photoId)));
+
+            if (photo.getAlbum().getId() != albumId) {
+                throw new IllegalArgumentException(String.format("앨범에 사진 ID %d가 존재하지 않습니다", photoId));
+            }
+
+            photoRepository.deleteById(photoId);
+        }
     }
 }

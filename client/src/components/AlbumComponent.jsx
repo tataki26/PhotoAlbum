@@ -84,7 +84,7 @@ export default function AlbumComponent() {
         .catch(error => console.log(error));
     }
 
-    const photoIds = [252,253];
+    const photoIds = [354,356];
 
     function deletePhoto() {
         deletePhotoApi(id, photoIds)

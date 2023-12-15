@@ -7,7 +7,7 @@ export const movePhotoApi
     = (id, photo) => apiClient.put(`/albums/${id}/photos/move/v2`, photo);
 
 export const deletePhotoApi
-    = (id, photoIds) => apiClient.delete(`/albums/${id}/photos`, {
+    = (id, photoIds) => apiClient.delete(`/albums/${id}/photos/v2`, {
         data: {photoIds}
     });
 
