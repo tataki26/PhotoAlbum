@@ -13,7 +13,7 @@ export const deletePhotoApi
 
 export const downloadPhotoApi
     = async (id, queryParams) => {
-        const response = await apiClient.get(`/albums/${id}/photos/download`, {
+        const response = await apiClient.get(`/albums/${id}/photos/download/v2`, {
             params: queryParams,
             responseType: 'blob',
         });

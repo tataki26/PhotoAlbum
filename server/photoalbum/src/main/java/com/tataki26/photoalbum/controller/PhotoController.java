@@ -5,7 +5,10 @@ import com.tataki26.photoalbum.service.PhotoService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,8 +55,8 @@ public class PhotoController {
         return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("download")
-    public ResponseEntity<Void> downloadPhotos(@RequestParam("photoIds") Long[] photoIds, HttpServletResponse response) {
+    @GetMapping("download/v1")
+    public ResponseEntity<Void> downloadPhotosV1(@RequestParam("photoIds") Long[] photoIds, HttpServletResponse response) {
         try {
             File file;
             if (photoIds.length == 1) {
@@ -70,6 +73,31 @@ public class PhotoController {
             throw new RuntimeException("파일을 다운로드 할 수 없습니다: ", e);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("download/v2")
+    public ResponseEntity<InputStreamResource> downloadPhotosV2(@RequestParam("photoIds") Long[] photoIds) {
+        try {
+            InputStream is;
+            HttpHeaders headers = new HttpHeaders();
+
+            if (photoIds.length == 1) {
+                is = photoService.retrievePhotoFileFromS3(photoIds[0]);
+                String contentType = photoService.getContentTypeForFile(photoIds[0]);
+                headers.setContentType(MediaType.parseMediaType(contentType));
+            } else {
+                is = photoService.retrievePhotoFilesFromS3(photoIds);
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=photos.zip");
+            }
+
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .headers(headers)
+                    .body(new InputStreamResource(is));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping

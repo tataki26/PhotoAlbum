@@ -2,6 +2,7 @@ package com.tataki26.photoalbum.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
 import com.tataki26.photoalbum.Constants;
 import com.tataki26.photoalbum.domain.Album;
 import com.tataki26.photoalbum.domain.Photo;
@@ -314,6 +315,62 @@ public class PhotoService {
         }
 
         return PhotoMapper.toDtoList(photos);
+    }
+
+    public InputStream retrievePhotoFileFromS3(Long id) {
+        Optional<Photo> photoOptional = photoRepository.findById(id);
+        if (photoOptional.isEmpty()) {
+            throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
+        }
+        String fileName = photoOptional.get().getName();
+        S3Object s3Object = amazonS3Client.getObject(bucket, "photo/" + fileName);
+        return s3Object.getObjectContent();
+    }
+
+    public InputStream retrievePhotoFilesFromS3(Long[] ids) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(bos);
+
+        for (Long id : ids) {
+            Optional<Photo> photoOptional = photoRepository.findById(id);
+            if (photoOptional.isEmpty()) {
+                throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
+            }
+            String fileName = photoOptional.get().getName();
+
+            S3Object s3Object = amazonS3Client.getObject(bucket, "photo/" + fileName);
+            InputStream objectData = s3Object.getObjectContent();
+
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            zos.putNextEntry(zipEntry);
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = objectData.read(buffer)) != -1) {
+                zos.write(buffer, 0, bytesRead);
+            }
+
+            objectData.close();
+            zos.closeEntry();
+        }
+
+        zos.close();
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+
+        return bis;
+    }
+
+    public String getContentTypeForFile(Long id) {
+        Optional<Photo> photoOptional = photoRepository.findById(id);
+        if (photoOptional.isEmpty()) {
+            throw new EntityNotFoundException(String.format("ID %d로 조회된 사진이 없습니다", id));
+        }
+        String fileName = photoOptional.get().getName();
+
+        return fileName.contains(".")
+                ? fileName.substring(fileName.indexOf(".") + 1)
+                : "";
     }
 
     @Transactional
